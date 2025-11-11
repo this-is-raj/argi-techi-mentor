@@ -1,1 +1,0 @@
-# argi-techi-mentor

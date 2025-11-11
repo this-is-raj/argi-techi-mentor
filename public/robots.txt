@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+Allow: /*.css
+Allow: /*.js
+Allow: /*.png
+Allow: /*.jpg
+Allow: /*.jpeg
+Allow: /*.gif
+Allow: /*.svg
+Allow: /*.webp
+
+Disallow: /agritechimentoradmin
+Disallow: /admin
+Disallow: /*.pdf$
+
+Sitemap: https://agritechimentor.com/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1
+
+# Request rate
+Request-rate: 1/10s
