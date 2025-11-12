@@ -1,173 +1,239 @@
-"use client"
+import Header from "@/components/header";
+import Footer from "@/components/footer";
+import Link from "next/link";
+import {
+  ArrowLeft,
+  BookCheckIcon,
+  FlaskConical,
+  Leaf,
+  MapPin,
+  Package,
+} from "lucide-react";
+import Head from "next/head";
+import About from "@/components/about";
+import Contact from "@/components/contact";
+import { redirect } from "next/navigation";
 
-import { useState, useEffect } from "react"
-import { useParams } from "next/navigation"
-import Header from "@/components/header"
-import Footer from "@/components/footer"
-import { ArrowLeft, ShoppingCart, Heart, HelpCircle, Edit, Pen, BookCheckIcon } from "lucide-react"
-import Link from "next/link"
-
-interface Product {
-  id: string
-  name: string
-  description: string
-  image: string
-  details?: string
-  benefits?: string
-  specifications?: string
-  category?: string
+export interface Product {
+  id: string;
+  name: string;
+  subtitle: string;
+  image: string;
+  botanicalName: string;
+  form: string;
+  packaging: string;
+  origin: string;
+  gallery: string[];
+  specifications: Record<string, string>;
+  description: string;
+  benefits: string;
+  details: string;
+  category?: string;
+  metaTitle?: string;
+  metaDescription?: string;
 }
 
-export default function ProductDetailPage() {
-  const params = useParams()
-  const productId = params.id as string
-  const [product, setProduct] = useState<Product | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [isFavorite, setIsFavorite] = useState(false)
+export default async function ProductDetailPage({
+  params,
+}: {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const { id } = await params;
 
-  useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        const response = await fetch(`/api/products?id=${productId}`)
-        if (response.ok) {
-          const data = await response.json()
-          setProduct(data)
-        }
-      } catch (error) {
-        console.error("Error fetching product:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
+  const response = await fetch(
+    `${process.env.APP_HOST}/api/products?id=${id}`
+  ).catch(() => ({ ok: false } as any));
 
-    if (productId) {
-      fetchProduct()
-    }
-  }, [productId])
+  const product = response.ok ? await response.json() : null;
 
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <main className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p>Loading product details...</p>
-          </div>
-        </main>
-        <Footer />
-      </>
-    )
-  }
-
-  if (!product) {
-    return (
-      <>
-        <Header />
-        <main className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-foreground mb-4">Product Not Found</h1>
-            <Link href="/" className="text-primary hover:underline">
-              Back to Home
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </>
-    )
-  }
+  if (!product) redirect("/");
 
   return (
     <>
+      <Head>
+        <title>
+          {product?.metaTitle
+            ? product.metaTitle
+            : "Premium Agricultural Products | Agritech"}
+        </title>
+        <meta
+          name="description"
+          content={
+            product?.metaDescription ||
+            "Explore premium-quality agricultural exports including spices, pulses, and grains — sourced from India's trusted farms and delivered worldwide."
+          }
+        />
+        <meta name="robots" content="index, follow" />
+        <meta
+          property="og:title"
+          content={product?.metaTitle || "Agritech Products"}
+        />
+        <meta
+          property="og:description"
+          content={product?.metaDescription || "Premium agricultural exports"}
+        />
+        <meta
+          property="og:image"
+          content={product?.image || "/default-og-image.jpg"}
+        />
+        <meta property="og:type" content="website" />
+      </Head>
       <Header />
-      <main className="min-h-screen bg-background">
+      <main className="min-h-screen bg-white">
         {/* Breadcrumb */}
-        <div className="max-w-7xl mx-auto px-3 md:px-4 py-6 md:py-8">
-          <Link href="/" className="inline-flex items-center gap-2 text-primary hover:text-orange-700 transition">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 text-primary hover:text-orange-700 transition"
+          >
             <ArrowLeft size={20} />
-            <span>Back to Products</span>
+            <span>Back to Home</span>
           </Link>
         </div>
 
-        {/* Product Details */}
-        <section className="max-w-7xl mx-auto px-3 md:px-4 pb-12 md:pb-16">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-            {/* Product Image */}
-            <div className="flex items-center justify-center">
-              <img
-                src={product.image || "/placeholder.svg"}
-                alt={product.name}
-                className="w-full h-auto max-h-96 object-cover rounded-2xl shadow-lg"
-              />
-            </div>
+        {/* Hero Section */}
+        <section className="max-w-5xl mx-auto text-center px-4 pb-10">
+          <img
+            src={product?.image}
+            alt={product?.name}
+            className="w-full h-80 md:h-[420px] object-cover rounded-2xl shadow-md mb-8"
+          />
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
+            {product?.name?.toUpperCase()}
+          </h1>
+          <p className="text-lg text-gray-600 font-medium mt-2">
+            {product?.subtitle}
+          </p>
 
-            {/* Product Info */}
-            <div className="flex flex-col justify-center">
-              <h1 className="text-3xl md:text-5xl font-bold text-foreground mb-2">{product.name}</h1>
+          <button className="mt-6 bg-yellow-600 hover:bg-yellow-700 text-white px-8 py-3 rounded-lg font-semibold inline-flex items-center gap-2 transition">
+            Request Quote <BookCheckIcon size={20} />
+          </button>
+        </section>
 
-              <p className="text-muted-foreground text-sm uppercase tracking-widest font-semibold mb-6">
-                {product.category?.replace("-", " ") || "Premium Product"}
-              </p>
+        {/* Product Summary */}
 
-              <p className="text-lg text-foreground leading-relaxed mb-8">{product.description}</p>
+        <section className="bg-gray-50 py-10">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-2xl font-bold text-center text-gray-900 mb-8">
+              PRODUCT SUMMARY
+            </h2>
 
-     
-           
-
-              {/* Product Details Sections */}
-              <div className="space-y-6">
-                {product.details && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                      Product Details
-                    </h3>
-                    <p className="text-foreground leading-relaxed">{product.details}</p>
-                  </div>
-                )}
-
-                {product.benefits && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                      Benefits
-                    </h3>
-                    <p className="text-foreground leading-relaxed">{product.benefits}</p>
-                  </div>
-                )}
-
-                {product.specifications && (
-                  <div>
-                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-                      Specifications
-                    </h3>
-                    <p className="text-foreground leading-relaxed">{product.specifications}</p>
-                  </div>
-                )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 bg-white rounded-xl p-6 shadow-sm">
+              {/* Botanical Name */}
+              <div className="flex items-center space-x-4 p-4 border rounded-lg hover:shadow-md transition">
+                <div className="bg-green-100 p-3 rounded-full">
+                  <FlaskConical className="text-green-600 w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">
+                    Botanical Name
+                  </p>
+                  <p className="font-semibold text-gray-900">
+                    {product?.botanicalName}
+                  </p>
+                </div>
               </div>
-                 <div className="flex gap-4 mt-8">
-                <button className="flex-1 bg-primary text-primary-foreground py-3 px-6 rounded-lg font-semibold hover:bg-orange-700 transition flex items-center justify-center gap-2">
-                 
-                  <span>Request Quote</span> <BookCheckIcon size={20} />
-                </button>
-               
+
+              {/* Form */}
+              <div className="flex items-center space-x-4 p-4 border rounded-lg hover:shadow-md transition">
+                <div className="bg-blue-100 p-3 rounded-full">
+                  <Leaf className="text-blue-600 w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Form</p>
+                  <p className="font-semibold text-gray-900">{product?.form}</p>
+                </div>
+              </div>
+
+              {/* Packaging */}
+              <div className="flex items-center space-x-4 p-4 border rounded-lg hover:shadow-md transition">
+                <div className="bg-yellow-100 p-3 rounded-full">
+                  <Package className="text-yellow-600 w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Packaging</p>
+                  <p className="font-semibold text-gray-900">
+                    {product?.packaging}
+                  </p>
+                </div>
+              </div>
+
+              {/* Origin */}
+              <div className="flex items-center space-x-4 p-4 border rounded-lg hover:shadow-md transition">
+                <div className="bg-red-100 p-3 rounded-full">
+                  <MapPin className="text-red-600 w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Origin</p>
+                  <p className="font-semibold text-gray-900">
+                    {product?.origin}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
         </section>
+        {/* Product Gallery */}
+        <section className="py-12">
+          <div className="max-w-5xl mx-auto px-4">
+            <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">
+              PRODUCT GALLERY
+            </h2>
 
-        {/* Related Products Section */}
-        <section className="bg-secondary py-12 md:py-16">
-          <div className="max-w-7xl mx-auto px-3 md:px-4">
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">Related Products</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {/* Placeholder for related products */}
-              <Link href="/" className="text-primary hover:underline text-center py-8">
-                View all products
-              </Link>
+              {product?.gallery?.map((img: string, index: number) => (
+                <div
+                  key={index}
+                  className="rounded-lg overflow-hidden shadow-sm"
+                >
+                  <img
+                    src={img}
+                    alt={`Gallery image ${index + 1}`}
+                    className="w-full h-52 object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+              ))}
             </div>
           </div>
         </section>
+
+        {/* Specifications */}
+        <section className="bg-gray-50 py-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">
+              SPECIFICATIONS
+            </h2>
+
+            <div className="overflow-x-auto">
+              <table className="w-full border border-gray-200 rounded-lg shadow-sm bg-white">
+                <tbody>
+                  {Object.entries({ ...product?.specifications }).map(
+                    ([key, value], index) => (
+                      <tr
+                        key={index}
+                        className={`border-b border-gray-100 ${
+                          index % 2 === 0 ? "bg-gray-50" : "bg-white"
+                        }`}
+                      >
+                        <td className="py-3 px-4 font-semibold text-gray-700">
+                          {key}
+                        </td>
+                        <td className="py-3 px-4 text-gray-600">
+                          {value as string}
+                        </td>
+                      </tr>
+                    )
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+        <About />
+        <Contact />
       </main>
       <Footer />
     </>
-  )
+  );
 }

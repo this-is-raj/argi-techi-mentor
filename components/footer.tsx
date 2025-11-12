@@ -1,31 +1,18 @@
-"use client"
-
-import { useEffect, useState } from "react"
-import { getHeaderFooterData } from "@/lib/db"
+import { getHeaderFooterData } from "@/lib/db";
 
 interface HeaderFooterData {
-  websiteName: string
-  footerDescription: string
-  footerAddress: string
-  footerPhone: string
-  footerEmail: string
-  website: string
+  websiteName: string;
+  footerDescription: string;
+  footerAddress: string;
+  footerPhone: string;
+  footerEmail: string;
+  website: string;
 }
 
-export default function Footer() {
-  const [footerData, setFooterData] = useState<HeaderFooterData | null>(null)
-  const [loading, setLoading] = useState(true)
+export default async function Footer() {
+  const footerData: HeaderFooterData = await getHeaderFooterData();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getHeaderFooterData()
-      setFooterData(data)
-      setLoading(false)
-    }
-    fetchData()
-  }, [])
-
-  if (loading || !footerData) return null
+  if (!footerData) return null;
 
   return (
     <footer className="bg-foreground text-white py-8 md:py-12">
@@ -38,11 +25,15 @@ export default function Footer() {
                 {footerData.websiteName.charAt(0)}
               </div>
               <div>
-                <h3 className="font-bold text-white text-xs md:text-base">{footerData.websiteName}</h3>
+                <h3 className="font-bold text-white text-xs md:text-base">
+                  {footerData.websiteName}
+                </h3>
                 <p className="text-xs text-white/60">Premium Ag. Products</p>
               </div>
             </div>
-            <p className="text-xs md:text-sm text-white/80 leading-relaxed">{footerData.footerDescription}</p>
+            <p className="text-xs md:text-sm text-white/80 leading-relaxed">
+              {footerData.footerDescription}
+            </p>
           </div>
 
           {/* About */}
@@ -50,12 +41,12 @@ export default function Footer() {
             <h3 className="font-bold text-sm md:text-lg mb-2 md:mb-4">About</h3>
             <ul className="space-y-1 md:space-y-2 text-white/80 text-xs md:text-sm">
               <li>
-                <a href="#about" className="hover:text-white transition">
+                <a href="/about" className="hover:text-white transition">
                   Our Story
                 </a>
               </li>
               <li>
-                <a href="#about" className="hover:text-white transition">
+                <a href="/about" className="hover:text-white transition">
                   Mission & Vision
                 </a>
               </li>
@@ -69,7 +60,9 @@ export default function Footer() {
 
           {/* Products */}
           <div>
-            <h3 className="font-bold text-sm md:text-lg mb-2 md:mb-4">Products</h3>
+            <h3 className="font-bold text-sm md:text-lg mb-2 md:mb-4">
+              Products
+            </h3>
             <ul className="space-y-1 md:space-y-2 text-white/80 text-xs md:text-sm">
               <li>
                 <a href="#products" className="hover:text-white transition">
@@ -91,10 +84,12 @@ export default function Footer() {
 
           {/* Quality */}
           <div>
-            <h3 className="font-bold text-sm md:text-lg mb-2 md:mb-4">Quality</h3>
+            <h3 className="font-bold text-sm md:text-lg mb-2 md:mb-4">
+              Quality
+            </h3>
             <ul className="space-y-1 md:space-y-2 text-white/80 text-xs md:text-sm">
               <li>
-                <a href="#about" className="hover:text-white transition">
+                <a href="/about" className="hover:text-white transition">
                   Certifications
                 </a>
               </li>
@@ -113,16 +108,24 @@ export default function Footer() {
 
           {/* Contact */}
           <div>
-            <h3 className="font-bold text-sm md:text-lg mb-2 md:mb-4">Get In Touch</h3>
+            <h3 className="font-bold text-sm md:text-lg mb-2 md:mb-4">
+              Get In Touch
+            </h3>
             <div className="space-y-1 text-white/80 text-xs md:text-sm">
               <p>{footerData.footerAddress}</p>
               <p className="mt-2 md:mt-3">
-                <a href={`tel:${footerData.footerPhone}`} className="hover:text-white transition">
+                <a
+                  href={`tel:${footerData.footerPhone}`}
+                  className="hover:text-white transition"
+                >
                   {footerData.footerPhone}
                 </a>
               </p>
               <p>
-                <a href={`mailto:${footerData.footerEmail}`} className="hover:text-white transition truncate">
+                <a
+                  href={`mailto:${footerData.footerEmail}`}
+                  className="hover:text-white transition truncate"
+                >
                   {footerData.footerEmail}
                 </a>
               </p>
@@ -148,5 +151,5 @@ export default function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

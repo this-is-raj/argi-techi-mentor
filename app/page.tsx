@@ -1,10 +1,10 @@
-import Header from "@/components/header"
-import Hero from "@/components/hero"
-import Products from "@/components/products"
-import Awards from "@/components/awards"
-import Contact from "@/components/contact"
-import About from "@/components/about"
-import Footer from "@/components/footer"
+import Header from "@/components/header";
+import Hero from "@/components/hero";
+import Products from "@/components/products";
+import Awards from "@/components/awards";
+import Contact from "@/components/contact";
+import About from "@/components/about";
+import Footer from "@/components/footer";
 
 export default function Home() {
   return (
@@ -21,5 +21,5 @@ export default function Home() {
       </div>
       <Footer />
     </main>
-  )
+  );
 }

@@ -2,12 +2,16 @@
   "name": "my-v0-project",
   "version": "0.1.0",
   "private": true,
+   "type": "module"
+,
   "scripts": {
     "build": "next build",
     "dev": "next dev",
     "lint": "eslint .",
-    "start": "next start"
+    "start": "next start",
+    "seed": "node scripts/seed-mongodb.js"
   },
+
   "dependencies": {
     "@aws-sdk/credential-providers": "latest",
     "@hookform/resolvers": "^3.10.0",
