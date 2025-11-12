@@ -58,7 +58,7 @@ export default async function Hero() {
                 </div>
               </div>
               <div className="flex gap-3 items-start">
-                <CheckCircle className="w-5 md:w-6 h-5 md:h-6 text-primary flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 md:w-6 h-5 md:h-6 text-primary  mt-0.5" />
                 <div>
                   <h3 className="font-semibold text-sm md:text-base text-foreground">
                     Certified Products
