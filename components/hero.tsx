@@ -69,7 +69,6 @@ export default async function Hero() {
                 </div>
               </div>
             </div>
-
             <div className="flex flex-col sm:flex-row gap-3 pt-2 md:pt-4">
               <Link href="#contact">
                 <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 md:px-8 text-sm md:text-base w-full sm:w-auto">
