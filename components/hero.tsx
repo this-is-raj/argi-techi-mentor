@@ -10,8 +10,10 @@ interface HeroData {
 }
 
 export default async function Hero() {
-  const headerData = await getHeaderFooterData();
-  const heroData: HeroData = await getHeroData();
+  const headerData = await getHeaderFooterData().catch(() => ({
+    websiteName: "Agri Techi Mentor",
+  }));
+  const heroData: HeroData | null = await getHeroData().catch(() => null);
   const websiteName = headerData.websiteName;
 
   if (!heroData) return null;
@@ -58,7 +60,7 @@ export default async function Hero() {
                 </div>
               </div>
               <div className="flex gap-3 items-start">
-                <CheckCircle className="w-5 md:w-6 h-5 md:h-6 text-primary flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 md:w-6 h-5 md:h-6 text-primary  mt-0.5" />
                 <div>
                   <h3 className="font-semibold text-sm md:text-base text-foreground">
                     Certified Products
@@ -69,7 +71,6 @@ export default async function Hero() {
                 </div>
               </div>
             </div>
-
             <div className="flex flex-col sm:flex-row gap-3 pt-2 md:pt-4">
               <Link href="#contact">
                 <Button className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 md:px-8 text-sm md:text-base w-full sm:w-auto">

@@ -42,7 +42,7 @@ export default async function ProductDetailPage({
   const { id } = await params;
 
   const response = await fetch(
-    `${process.env.APP_HOST}/api/products?id=${id}`
+    `${process.env.NEXT_PUBLIC_APP_HOST}/api/products?id=${id}`
   ).catch(() => ({ ok: false } as any));
 
   const product = response.ok ? await response.json() : null;
