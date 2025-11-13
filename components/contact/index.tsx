@@ -10,14 +10,16 @@ interface ContactData {
 }
 
 export default async function Contact() {
-  const contactData: ContactData = await getContactData();
+  const contactData: ContactData | null = await getContactData().catch(
+    () => null
+  );
 
   if (!contactData) return null;
 
   return (
     <section
       id="contact"
-      className="py-20 bg-gradient-to-b from-white to-gray-50"
+      className="py-20 bg-linear-to-b from-white to-gray-50"
     >
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
@@ -35,7 +37,7 @@ export default async function Contact() {
           <div className="space-y-8">
             {/* Address */}
             <div className="flex gap-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                 <MapPin className="text-primary" size={24} />
               </div>
               <div>
@@ -46,7 +48,7 @@ export default async function Contact() {
 
             {/* Phone */}
             <div className="flex gap-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                 <Phone className="text-primary" size={24} />
               </div>
               <div>
@@ -57,7 +59,7 @@ export default async function Contact() {
 
             {/* Email */}
             <div className="flex gap-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                 <Mail className="text-primary" size={24} />
               </div>
               <div>
@@ -68,7 +70,7 @@ export default async function Contact() {
 
             {/* Website */}
             <div className="flex gap-4">
-              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
                 <Globe className="text-primary" size={24} />
               </div>
               <div>

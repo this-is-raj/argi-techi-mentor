@@ -10,8 +10,10 @@ interface HeroData {
 }
 
 export default async function Hero() {
-  const headerData = await getHeaderFooterData();
-  const heroData: HeroData = await getHeroData();
+  const headerData = await getHeaderFooterData().catch(() => ({
+    websiteName: "Agri Techi Mentor",
+  }));
+  const heroData: HeroData | null = await getHeroData().catch(() => null);
   const websiteName = headerData.websiteName;
 
   if (!heroData) return null;

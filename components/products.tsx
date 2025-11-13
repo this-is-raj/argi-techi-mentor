@@ -2,7 +2,9 @@ import Link from "next/link";
 import { Product } from "@/app/products/[id]/page";
 
 export default async function Products() {
-  const response = await fetch(`${process.env.APP_HOST}/api/products`);
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_APP_HOST}/api/products`
+  ).catch(() => ({ ok: false } as any));
 
   const products = response.ok
     ? (((await response.json()) || []) as Product[])

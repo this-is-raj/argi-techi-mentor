@@ -180,10 +180,13 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         }
 
         // ✅ Send FormData directly (no JSON.stringify)
-        const res = await fetch(`${process.env.APP_HOST}/api/products`, {
-          method: "POST",
-          body: formData,
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_APP_HOST}/api/products`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!res.ok) throw new Error("Failed to create product");
 

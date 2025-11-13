@@ -8,14 +8,17 @@ interface AboutData {
 }
 
 export default async function About() {
-  const aboutData: AboutData = await getAboutData();
+  const aboutData: AboutData | null = await getAboutData().catch((err) => {
+    console.error("Failed to load about data:", err);
+    return null;
+  });
 
   if (!aboutData) return null;
 
   return (
     <section
       id="about"
-      className="py-12 md:py-20 bg-gradient-to-b from-white to-gray-50"
+      className="py-12 md:py-20 bg-linear-to-b from-white to-gray-50"
     >
       <div className="max-w-7xl mx-auto px-3 md:px-4">
         {/* Section Header */}

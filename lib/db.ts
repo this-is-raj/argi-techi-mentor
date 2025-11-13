@@ -51,9 +51,12 @@ interface HeaderFooterData {
 
 export async function getHeroData(): Promise<HeroData> {
   try {
-    const response = await fetch(`${process.env.APP_HOST}/api/hero`, {
-      cache: "no-store",
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_HOST}/api/hero`,
+      {
+        cache: "no-store",
+      }
+    );
     if (response.ok) {
       return await response.json();
     }
@@ -71,9 +74,12 @@ export async function getHeroData(): Promise<HeroData> {
 
 export async function getProducts(): Promise<Product[]> {
   try {
-    const response = await fetch(`${process.env.APP_HOST}/api/products`, {
-      cache: "no-store",
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_HOST}/api/products`,
+      {
+        cache: "no-store",
+      }
+    );
     if (response.ok) {
       return await response.json();
     }
@@ -86,7 +92,7 @@ export async function getProducts(): Promise<Product[]> {
 export async function getProductById(id: string): Promise<Product | null> {
   try {
     const response = await fetch(
-      `${process.env.APP_HOST}/api/products?id=${id}`,
+      `${process.env.NEXT_PUBLIC_APP_HOST}/api/products?id=${id}`,
       {
         cache: "no-store",
       }
@@ -102,9 +108,12 @@ export async function getProductById(id: string): Promise<Product | null> {
 
 export async function getContactData(): Promise<ContactData> {
   try {
-    const response = await fetch(`${process.env.APP_HOST}/api/contact`, {
-      cache: "no-store",
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_HOST}/api/contact`,
+      {
+        cache: "no-store",
+      }
+    );
     if (response.ok) {
       return await response.json();
     }
@@ -121,9 +130,12 @@ export async function getContactData(): Promise<ContactData> {
 
 export async function getAboutData(): Promise<AboutData> {
   try {
-    const response = await fetch(`${process.env.APP_HOST}/api/about`, {
-      cache: "no-store",
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_HOST}/api/about`,
+      {
+        cache: "no-store",
+      }
+    );
     if (response.ok) {
       return await response.json();
     }
@@ -142,7 +154,7 @@ export async function getAboutData(): Promise<AboutData> {
 
 export async function updateHeroData(data: HeroData) {
   try {
-    await fetch(`${process.env.APP_HOST}/api/hero`, {
+    await fetch(`${process.env.NEXT_PUBLIC_APP_HOST}/api/hero`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -155,7 +167,7 @@ export async function updateHeroData(data: HeroData) {
 export async function updateProducts(data: Product[]) {
   try {
     for (const product of data) {
-      await fetch(`${process.env.APP_HOST}/api/products`, {
+      await fetch(`${process.env.NEXT_PUBLIC_APP_HOST}/api/products`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(product),
@@ -168,7 +180,7 @@ export async function updateProducts(data: Product[]) {
 
 export async function updateContactData(data: ContactData) {
   try {
-    await fetch(`${process.env.APP_HOST}/api/contact`, {
+    await fetch(`${process.env.NEXT_PUBLIC_APP_HOST}/api/contact`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -180,7 +192,7 @@ export async function updateContactData(data: ContactData) {
 
 export async function updateAboutData(data: AboutData) {
   try {
-    await fetch(`${process.env.APP_HOST}/api/about`, {
+    await fetch(`${process.env.NEXT_PUBLIC_APP_HOST}/api/about`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -192,11 +204,14 @@ export async function updateAboutData(data: AboutData) {
 
 export async function addProduct(product: Omit<Product, "id">) {
   try {
-    const response = await fetch(`${process.env.APP_HOST}/api/products`, {
-      method: "POST",
-      headers: { "Content-Type": "multipart/form-data" },
-      body: JSON.stringify(product),
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_HOST}/api/products`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "multipart/form-data" },
+        body: JSON.stringify(product),
+      }
+    );
     if (response.ok) {
       return await response.json();
     }
@@ -208,7 +223,7 @@ export async function addProduct(product: Omit<Product, "id">) {
 
 export async function deleteProduct(id: string) {
   try {
-    await fetch(`${process.env.APP_HOST}/api/products?id=${id}`, {
+    await fetch(`${process.env.NEXT_PUBLIC_APP_HOST}/api/products?id=${id}`, {
       method: "DELETE",
     });
   } catch (error) {
@@ -218,9 +233,12 @@ export async function deleteProduct(id: string) {
 
 export async function getHeaderFooterData(): Promise<HeaderFooterData> {
   try {
-    const response = await fetch(`${process.env.APP_HOST}/api/header-footer`, {
-      cache: "no-store",
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_HOST}/api/header-footer`,
+      {
+        cache: "no-store",
+      }
+    );
     if (response.ok) {
       return await response.json();
     }
@@ -243,7 +261,7 @@ export async function getHeaderFooterData(): Promise<HeaderFooterData> {
 
 export async function updateHeaderFooterData(data: HeaderFooterData) {
   try {
-    await fetch(`${process.env.APP_HOST}/api/header-footer`, {
+    await fetch(`${process.env.NEXT_PUBLIC_APP_HOST}/api/header-footer`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -255,7 +273,7 @@ export async function updateHeaderFooterData(data: HeaderFooterData) {
 
 export async function updateProduct(id: string, product: Product) {
   try {
-    await fetch(`${process.env.APP_HOST}/api/products`, {
+    await fetch(`${process.env.NEXT_PUBLIC_APP_HOST}/api/products`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...product, id }),
