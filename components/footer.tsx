@@ -1,3 +1,4 @@
+"use client";
 import { getHeaderFooterData } from "@/lib/db";
 
 interface HeaderFooterData {

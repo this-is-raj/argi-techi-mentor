@@ -1,8 +1,8 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
-import "./globals.css"
+import type React from "react";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import "./globals.css";
 
 const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
@@ -11,7 +11,8 @@ export const metadata: Metadata = {
   title: "Agro TechieMentor - Premium Agricultural Exports from India",
   description:
     "Export premium spices, pulses, fresh vegetables, and agricultural products from India to 50+ countries. Quality certified agricultural exports with global shipping.",
-  keywords: "agricultural exports, spices, pulses, vegetables, grains, oil seeds, India exports, quality products",
+  keywords:
+    "agricultural exports, spices, pulses, vegetables, grains, oil seeds, India exports, quality products",
   authors: [{ name: "Agro TechieMentor" }],
   creator: "Agro TechieMentor",
   publisher: "Agro TechieMentor",
@@ -22,10 +23,11 @@ export const metadata: Metadata = {
     url: "https://agritechimentor.com",
     siteName: "Agro TechieMentor",
     title: "Agro TechieMentor - Premium Agricultural Exports",
-    description: "Premium agricultural products exported from India to global markets",
+    description:
+      "Premium agricultural products exported from India to global markets",
     images: [
       {
-        url: "/InShot_20250821_121844786.jpg",
+        url: "/Logo.png",
         width: 1200,
         height: 630,
         alt: "Agro TechieMentor Products",
@@ -41,26 +43,26 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/InShot_20250821_121844786.jpg",
+        url: "/Logo.png",
         media: "(prefers-color-scheme: light)",
       },
       {
-        url: "/InShot_20250821_121844786.jpg",
+        url: "/Logo.png",
         media: "(prefers-color-scheme: dark)",
       },
       {
-        url: "/InShot_20250821_121844786.jpg",
+        url: "/Logo.png",
         type: "image/svg+xml",
       },
     ],
-    apple: "/InShot_20250821_121844786.jpg",
+    apple: "/Logo.png",
   },
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en">
@@ -81,7 +83,10 @@ export default function RootLayout({
                 telephone: "+91-9549235277",
                 email: "techiementor.co@gmail.com",
               },
-              sameAs: ["https://www.facebook.com/agritechimentor", "https://twitter.com/agritechimentor"],
+              sameAs: [
+                "https://www.facebook.com/agritechimentor",
+                "https://twitter.com/agritechimentor",
+              ],
             }),
           }}
         />
@@ -91,5 +96,5 @@ export default function RootLayout({
         <Analytics />
       </body>
     </html>
-  )
+  );
 }
