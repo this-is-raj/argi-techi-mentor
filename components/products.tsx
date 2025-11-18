@@ -3,9 +3,7 @@ import { Product } from "@/app/products/[id]/page";
 import { ArrowRight } from "lucide-react";
 
 export default async function Products() {
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products`
-  );
+  const response = await fetch(`${process.env.APP_HOST}/api/products`);
 
   const products = response.ok
     ? (((await response.json()) || []) as Product[])
