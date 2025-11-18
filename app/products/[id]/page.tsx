@@ -43,13 +43,8 @@ export default async function ProductDetailPage({
   const { id } = await params;
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_}/api/products?id=${id}`
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/products?id=${id}`
   ).catch(() => ({ ok: false } as any));
-
-  console.log(
-    "NEXT_PUBLIC_ =++++++++++++++++++++++++++++",
-    process.env.NEXT_PUBLIC_
-  );
 
   const product = response.ok ? await response.json() : null;
 

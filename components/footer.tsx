@@ -1,4 +1,3 @@
-"use client";
 import { getHeaderFooterData } from "@/lib/db";
 
 interface HeaderFooterData {
@@ -11,7 +10,7 @@ interface HeaderFooterData {
 }
 
 export default async function Footer() {
-  const footerData: HeaderFooterData = await getHeaderFooterData();
+  const footerData: HeaderFooterData | null = await getHeaderFooterData();
 
   if (!footerData) return null;
 

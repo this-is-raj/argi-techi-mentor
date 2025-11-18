@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { clearAdminSession } from "@/lib/auth";
 import {
@@ -180,10 +178,13 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         }
 
         // ✅ Send FormData directly (no JSON.stringify)
-        const res = await fetch(`${process.env.NEXT_PUBLIC_}/api/products`, {
-          method: "POST",
-          body: formData,
-        });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/products`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
 
         if (!res.ok) throw new Error("Failed to create product");
 
