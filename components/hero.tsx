@@ -11,14 +11,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { getHeroData, getHeaderFooterData } from "@/lib/db";
 import Link from "next/link";
-
-interface HeroData {
-  title: string;
-  subtitle: string;
-  cta_text: string;
-}
 
 export default async function Hero() {
   return (
@@ -54,7 +47,6 @@ export default async function Hero() {
       {/* Content */}
       <div className="relative z-10 w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center w-full max-w-4xl">
-          {/* Animated Badge with Icons - Mobile Optimized */}
           <div className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 animate-fadeInUp">
             <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
             <span className="text-white text-xs sm:text-sm font-medium">
@@ -62,7 +54,6 @@ export default async function Hero() {
             </span>
           </div>
 
-          {/* Main Heading with Responsive Typography */}
           <h1 className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight">
             <span className="block animate-typing overflow-hidden whitespace-nowrap border-r-2 sm:border-r-4 border-r-white pr-1">
               Premium Indian
@@ -72,7 +63,6 @@ export default async function Hero() {
             </span>
           </h1>
 
-          {/* Subtitle with Responsive Styling */}
           <div className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 font-light animate-fadeInUp animation-delay-300 leading-relaxed">
               Certified Quality Exporter Since 2022

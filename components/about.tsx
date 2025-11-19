@@ -1,109 +1,98 @@
 import { getAboutData } from "@/lib/db";
-
-interface AboutData {
-  title: string;
-  description: string;
-  mission: string;
-  vision: string;
-}
+import { AboutData } from "@/types/about";
 
 export default async function About() {
   const aboutData: AboutData = await getAboutData();
-
   if (!aboutData) return null;
 
   return (
-    <section
-      id="about"
-      className="py-12 md:py-20 bg-gradient-to-b from-white to-gray-50"
-    >
-      <div className="max-w-7xl mx-auto px-3 md:px-4">
-        {/* Section Header */}
-        <div className="text-center mb-12 md:mb-16">
-          <p className="text-primary uppercase tracking-widest text-xs md:text-sm font-semibold mb-2 md:mb-4">
+    <section className="py-20 bg-gradient-to-b from-white to-gray-100">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* HEADER */}
+        <div className="text-center mb-20">
+          <span className="text-primary font-semibold uppercase tracking-widest text-sm">
             About Us
-          </p>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6 text-foreground text-pretty">
+          </span>
+
+          <h2 className="text-4xl md:text-5xl font-extrabold mt-3 text-gray-900 leading-tight">
             {aboutData.title}
           </h2>
-          <p className="text-sm md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+
+          <p className="text-gray-600 max-w-2xl mx-auto mt-5 text-lg leading-relaxed">
             {aboutData.description}
           </p>
         </div>
 
-        {/* Mission & Vision Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+        {/* Mission & Vision Cards */}
+        <div className="grid md:grid-cols-2 gap-10">
           {/* Mission Card */}
-          <div className="bg-white rounded-xl md:rounded-2xl shadow-lg hover:shadow-xl transition-shadow p-6 md:p-8 border-l-4 border-primary">
-            <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
-              <div className="w-10 md:w-12 h-10 md:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-xl md:text-2xl">🎯</span>
+          <div className="bg-white rounded-2xl shadow-xl p-10 border border-gray-100 hover:shadow-2xl transition-all duration-300">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center">
+                <span className="text-3xl">🎯</span>
               </div>
-              <h3 className="text-xl md:text-2xl font-bold text-foreground">
-                Our Mission
-              </h3>
+              <h3 className="text-2xl font-bold text-gray-900">Our Mission</h3>
             </div>
-            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+
+            <p className="text-gray-600 text-lg leading-relaxed">
               {aboutData.mission}
             </p>
           </div>
 
           {/* Vision Card */}
-          <div className="bg-white rounded-xl md:rounded-2xl shadow-lg hover:shadow-xl transition-shadow p-6 md:p-8 border-l-4 border-primary">
-            <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
-              <div className="w-10 md:w-12 h-10 md:h-12 bg-primary/10 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-xl md:text-2xl">🌍</span>
+          <div className="bg-white rounded-2xl shadow-xl p-10 border border-gray-100 hover:shadow-2xl transition-all duration-300">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center">
+                <span className="text-3xl">🌍</span>
               </div>
-              <h3 className="text-xl md:text-2xl font-bold text-foreground">
-                Our Vision
-              </h3>
+              <h3 className="text-2xl font-bold text-gray-900">Our Vision</h3>
             </div>
-            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+
+            <p className="text-gray-600 text-lg leading-relaxed">
               {aboutData.vision}
             </p>
           </div>
         </div>
 
-        {/* Key Features */}
-        <div className="mt-12 md:mt-16 pt-12 md:pt-16 border-t border-border">
-          <h3 className="text-2xl md:text-3xl font-bold mb-8 md:mb-12 text-center text-foreground">
+        {/* WHY CHOOSE US */}
+        <div className="mt-24 border-t pt-20">
+          <h3 className="text-center text-3xl md:text-4xl font-bold text-gray-900 mb-14">
             Why Choose Us
           </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
-                icon: "✓",
+                icon: "🏆",
                 title: "Quality Assured",
-                desc: "100% certified products",
+                desc: "100% certified premium products",
               },
               {
                 icon: "🌏",
                 title: "Global Reach",
-                desc: "Export to 50+ countries",
+                desc: "Exporting to 50+ countries worldwide",
               },
               {
                 icon: "📦",
                 title: "Fast Delivery",
-                desc: "Reliable shipping services",
+                desc: "Secure & reliable shipping services",
               },
               {
                 icon: "🤝",
-                title: "Customer First",
-                desc: "Dedicated support team",
+                title: "Trusted Partner",
+                desc: "Customer-first export experience",
               },
-            ].map((feature, idx) => (
+            ].map((item, i) => (
               <div
-                key={idx}
-                className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 text-center hover:shadow-lg transition-shadow"
+                key={i}
+                className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 text-center hover:-translate-y-1 hover:shadow-2xl transition-all duration-300"
               >
-                <div className="text-3xl md:text-4xl mb-3 md:mb-4">
-                  {feature.icon}
-                </div>
-                <h4 className="font-semibold text-foreground text-sm md:text-base mb-1 md:mb-2">
-                  {feature.title}
+                <div className="text-4xl mb-4">{item.icon}</div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-2">
+                  {item.title}
                 </h4>
-                <p className="text-muted-foreground text-xs md:text-sm">
-                  {feature.desc}
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {item.desc}
                 </p>
               </div>
             ))}

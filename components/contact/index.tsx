@@ -2,12 +2,7 @@ import { MapPin, Phone, Mail, Globe } from "lucide-react";
 import { getContactData } from "@/lib/db";
 import { ContactForm } from "./ContactForm";
 
-interface ContactData {
-  email: string;
-  phone: string;
-  address: string;
-  website: string;
-}
+import { ContactData } from "@/types/contact";
 
 export default async function Contact() {
   const contactData: ContactData = await getContactData();
