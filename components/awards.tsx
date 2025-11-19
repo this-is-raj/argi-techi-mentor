@@ -2,6 +2,7 @@ export default function Awards() {
   return (
     <section id="quality" className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
+        {/* Awards Section */}
         <h2 className="text-4xl font-bold mb-16 text-center">
           Awards & Accreditations
         </h2>
@@ -9,78 +10,91 @@ export default function Awards() {
         <div className="grid md:grid-cols-2 gap-8 mb-12">
           {/* Spices Board India */}
           <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-              <span className="text-3xl">🏅</span>
-            </div>
-            <h3 className="text-2xl font-bold mb-3">Spices Board India</h3>
-            <p className="text-muted-foreground leading-relaxed">
-              We have specialized license and necessary certificates from Spices
-              Board India, we can ensure our standards and export of all spices
-              from the Spices Board of India.
+            <img
+              src="/certifications/spices-board.png"
+              alt="Spices Board India"
+              className="h-20 w-auto mx-auto mb-6 object-contain"
+            />
+            <h3 className="text-2xl font-bold mb-3 text-center">
+              Spices Board India
+            </h3>
+            <p className="text-muted-foreground leading-relaxed text-center">
+              Licensed & certified by Spices Board India, ensuring export
+              standards for all Indian spices.
             </p>
           </div>
 
           {/* APEDA Export Award */}
           <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-              <span className="text-3xl">🏆</span>
-            </div>
-            <h3 className="text-2xl font-bold mb-3">APEDA Export Award</h3>
-            <p className="text-muted-foreground leading-relaxed">
-              We have been awarded by Agricultural and Processed Food Products
-              Export Development Authority. We are registered to serve our
-              clients with the best quality products.
+            <img
+              src="/certifications/apeda.png"
+              alt="APEDA Certificate"
+              className="h-20 w-auto mx-auto mb-6 object-contain"
+            />
+            <h3 className="text-2xl font-bold mb-3 text-center">
+              APEDA Registered Exporter
+            </h3>
+            <p className="text-muted-foreground leading-relaxed text-center">
+              Registered with Agricultural & Processed Food Products Export
+              Development Authority for global food export compliance.
             </p>
           </div>
 
           {/* Quality Focus */}
           <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-              <span className="text-3xl">⭐</span>
-            </div>
-            <h3 className="text-2xl font-bold mb-3">Our Quality Focus</h3>
-            <p className="text-muted-foreground leading-relaxed">
-              We are committed to quality and fresh produce in our customers and
-              enhance the customer satisfaction levels through improved value
-              addition and stringent commitment on our processes.
+            <img
+              src="/certifications/iso22000.png"
+              alt="ISO 22000"
+              className="h-20 w-auto mx-auto mb-6 object-contain"
+            />
+            <h3 className="text-2xl font-bold mb-3 text-center">
+              International Quality Standards
+            </h3>
+            <p className="text-muted-foreground leading-relaxed text-center">
+              We ensure world-class processing & packing under ISO-guided food
+              safety standards.
             </p>
           </div>
 
           {/* Harvest Calendar */}
           <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition">
-            <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-              <span className="text-3xl">📅</span>
-            </div>
-            <h3 className="text-2xl font-bold mb-3">Harvest Calendar</h3>
-            <p className="text-muted-foreground leading-relaxed">
-              The harvest calendar provides you with details on which crop comes
-              in which month round the year. Based on the seasonal crop harvest
-              calendar, you will understand best seasons for different crops
-              that we export.
+            <img
+              src="/certifications/haccp.avif"
+              alt="HACCP"
+              className="h-20 w-auto mx-auto mb-6 object-contain"
+            />
+            <h3 className="text-2xl font-bold mb-3 text-center">
+              HACCP Certified Facility
+            </h3>
+            <p className="text-muted-foreground leading-relaxed text-center">
+              Our entire process follows HACCP compliance ensuring hygiene,
+              safety & freshness.
             </p>
           </div>
         </div>
 
-        {/* Certifications */}
-        <div className="bg-white p-8 rounded-2xl shadow-lg">
-          <h3 className="text-2xl font-bold mb-8 text-center">
-            Our Certifications & Standards
+        {/* Certifications Section */}
+        <div className="bg-white p-10 rounded-2xl shadow-lg">
+          <h3 className="text-3xl font-bold mb-10 text-center">
+            Our Certifications & Memberships
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-center">
+
+          {/* Logo Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 place-items-center">
             {[
-              "ISO 22000:2018",
-              "HACCP Certified",
-              "FSSAI Licensed",
-              "Organic Certified",
-              "Fair Trade Certified",
-              "FDA Approved",
-            ].map((cert, idx) => (
-              <div
+              { src: "/certifications/fssai.webp", alt: "FSSAI" },
+              { src: "/certifications/usda-organic.gif", alt: "USDA Organic" },
+              { src: "/certifications/eu-organic.png", alt: "EU Organic" },
+              { src: "/certifications/halal.jpg", alt: "Halal" },
+              { src: "/certifications/kosher.png", alt: "Kosher" },
+              { src: "/certifications/fda.jpeg", alt: "FDA Approved" },
+            ].map((logo, idx) => (
+              <img
                 key={idx}
-                className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-6 hover:from-primary/20 hover:to-primary/10 transition"
-              >
-                <p className="font-semibold text-foreground text-sm">{cert}</p>
-              </div>
+                src={logo.src}
+                alt={logo.alt}
+                className="h-14 w-auto object-contain opacity-90 hover:opacity-100 transition"
+              />
             ))}
           </div>
         </div>

@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import Link from "next/link";
@@ -42,8 +43,13 @@ export default async function ProductDetailPage({
   const { id } = await params;
 
   const response = await fetch(
-    `${process.env.APP_HOST}/api/products?id=${id}`
+    `${process.env.NEXT_PUBLIC_}/api/products?id=${id}`
   ).catch(() => ({ ok: false } as any));
+
+  console.log(
+    "NEXT_PUBLIC_ =++++++++++++++++++++++++++++",
+    process.env.NEXT_PUBLIC_
+  );
 
   const product = response.ok ? await response.json() : null;
 

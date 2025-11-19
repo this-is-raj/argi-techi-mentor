@@ -1,20 +1,13 @@
 import Link from "next/link";
 import { Product } from "@/app/products/[id]/page";
+import { ArrowRight } from "lucide-react";
 
 export default async function Products() {
-  const response = await fetch(`${process.env.APP_HOST}/api/products`);
+  const response = await fetch(`${process.env.NEXT_PUBLIC_}/api/products`);
 
   const products = response.ok
     ? (((await response.json()) || []) as Product[])
     : [];
-
-  const featured = [
-    { name: "Cardamom", icon: "🫘" },
-    { name: "Turmeric", icon: "🧡" },
-    { name: "Rice", icon: "🍚" },
-    { name: "Chilies", icon: "🌶️" },
-    { name: "Cumin Seeds", icon: "🟤" },
-  ];
 
   return (
     <>
@@ -40,19 +33,30 @@ export default async function Products() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16">
             {products.map((product) => (
               <Link key={product.id} href={`/products/${product.id}`}>
-                <div className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer">
-                  <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-full h-56 sm:h-64 object-cover group-hover:scale-110 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex flex-col justify-end p-4 md:p-6">
-                    <h3 className="text-xl md:text-2xl font-bold text-white mb-1 md:mb-2">
+                <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-100 hover:scale-105 overflow-hidden">
+                  {/* Top Half - Product Image */}
+                  <div className="h-48 bg-gray-50 flex items-center justify-center p-4">
+                    <img
+                      src={product.image || "/placeholder.svg"}
+                      alt={product.name}
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                    />
+                  </div>
+
+                  {/* Bottom Half - Product Info */}
+                  <div className="p-4 md:p-6">
+                    <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 line-clamp-2">
                       {product.name}
                     </h3>
-                    <p className="text-white/90 text-xs md:text-sm line-clamp-2">
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
                       {product.description}
                     </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-primary font-semibold text-sm hover:text-primary/80 transition-colors">
+                        Enquire Now
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-primary group-hover:translate-x-1 transition-transform" />
+                    </div>
                   </div>
                 </div>
               </Link>
@@ -67,22 +71,6 @@ export default async function Products() {
             <p className="text-center text-muted-foreground mb-8 md:mb-12 uppercase text-xs md:text-sm tracking-widest font-semibold">
               PACKED AND DISPATCHED WITH PERFECTION
             </p>
-
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4">
-              {featured.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-xl p-4 md:p-6 text-center hover:from-primary/20 hover:to-primary/10 transition group cursor-pointer"
-                >
-                  <div className="text-3xl md:text-4xl mb-2 md:mb-3 group-hover:scale-110 transition transform">
-                    {item.icon}
-                  </div>
-                  <p className="font-semibold text-foreground text-sm md:text-base">
-                    {item.name}
-                  </p>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>

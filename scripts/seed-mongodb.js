@@ -49,6 +49,94 @@ async function seedDatabase() {
         metaDescription:
           "Export high-quality Indian Groundnuts (Peanuts) sourced from trusted farms in Gujarat and Rajasthan. Moisture-controlled, uniform kernels for global buyers.",
       },
+
+      {
+        id: "2",
+        name: "Cumin Seeds",
+        subtitle: "Premium Export Quality",
+        image: "/c2.jpg",
+        botanicalName: "Cuminum cyminum",
+        form: "Whole Seeds",
+        packaging: "25 kg / 50 kg PP Bags or Jute Bags",
+        origin: "Rajasthan & Gujarat, India",
+        gallery: ["/c1.webp", "/c2.jpg", "/c3.jpg"],
+        specifications: {
+          Purity: "99% / 99.5% / 99.9%",
+          Moisture: "≤ 8%",
+          Admixture: "≤ 1%",
+          Flavour: "Strong Aromatic",
+          "Foreign Matter": "≤ 0.5%",
+          Grade: "Singapore / Europe Quality",
+          Packing: "25 kg / 50 kg PP or Jute Bags",
+        },
+        description:
+          "High-aroma Cumin Seeds sourced from the finest farms of Rajasthan and Gujarat. Known for their rich flavor, uniform size, and purity, our cumin seeds are processed under strict quality checks, ensuring export-ready standards.",
+        benefits:
+          "Aids digestion, boosts immunity, improves metabolism, and adds a strong distinctive flavor to culinary dishes.",
+        details:
+          "Our Cumin Seeds go through advanced cleaning, sorting, and packaging systems. Each batch is inspected for purity, aroma, and moisture control to meet international quality requirements for the Middle East, Europe, and American markets.",
+        metaTitle: "Premium Indian Cumin Seeds Exporter | Agritech",
+        metaDescription:
+          "Export-quality Cumin Seeds (Jeera) from India with strong aroma, high purity, and controlled moisture levels. Ideal for spice traders and global buyers.",
+      },
+      {
+        id: "3",
+        name: "Green Banana",
+        subtitle: "Fresh Export Quality",
+        image: "/p2.jpg",
+        botanicalName: "Musa acuminata",
+        form: "Fresh Raw Bananas",
+        packaging: "7 kg / 13 kg / 20 kg Corrugated Export Boxes",
+        origin: "Tamil Nadu, Maharashtra & Andhra Pradesh, India",
+        gallery: ["/p1.jpg", "/p2.jpeg", "/p3.jpg"],
+        specifications: {
+          Size: "14 cm – 20 cm (Uniform Size)",
+          Color: "Natural Green",
+          Maturity: "Grade A – 80% Mature",
+          ShelfLife: "25–35 Days (Under Controlled Conditions)",
+          "Net Weight": "As per packaging (7 / 13 / 20 kg)",
+          Packing: "Corrugated Boxes with Air Vents",
+        },
+        description:
+          "Fresh, export-quality Green Bananas sourced from certified farms in India. Known for their long shelf life, uniform size, and superior freshness, making them ideal for Middle East, Europe, and Asian markets.",
+        benefits:
+          "High in fiber, rich in Vitamin B6, supports digestion, boosts energy, and ideal for culinary use in multiple cuisines.",
+        details:
+          "Our Green Bananas are harvested at optimum maturity and processed with international standards. Each batch is quality checked for size, color, freshness, and packing integrity to ensure it reaches buyers in perfect condition.",
+        metaTitle: "Fresh Green Banana Exporter from India | Agritech",
+        metaDescription:
+          "Supplying fresh, export-quality Green Bananas with superior shelf life and perfect size. Ideal for retail and wholesale export markets.",
+      },
+
+      {
+        id: "4",
+        name: "Pomegranate",
+        subtitle: "Fresh Export Quality",
+        image: "/a2.jpeg",
+        botanicalName: "Punica granatum",
+        form: "Fresh Whole Fruit",
+        packaging: "3 kg / 5 kg / 10 kg Corrugated Export Boxes",
+        origin: "Maharashtra, Gujarat & Karnataka, India",
+        gallery: ["/a1.jpg", "/a2.jpeg", "/a3.jpg"],
+        specifications: {
+          Variety: "Bhagwa / Super Bhagwa",
+          Color: "Bright Red",
+          Size: "200g – 350g per fruit",
+          BrixLevel: "14–16% (High Sweetness)",
+          ShelfLife: "25–40 Days (Cold Storage)",
+          "Net Weight": "As per box (3 / 5 / 10 kg)",
+          Packing: "Corrugated Boxes with Soft Wrapping",
+        },
+        description:
+          "Premium quality export-grade Pomegranates known for their deep red color, high sweetness, and soft edible seeds. Sourced from Maharashtra’s best orchards and packed under strict hygiene and international export standards.",
+        benefits:
+          "Rich in antioxidants, boosts immunity, supports heart health, excellent for skin, and helps improve digestion.",
+        details:
+          "Our Pomegranates are carefully selected for uniform color, size, and sweetness. Each batch undergoes quality checks for brix level, maturity, and packaging durability to meet global export expectations.",
+        metaTitle: "Fresh Pomegranate Exporter from India | Agritech",
+        metaDescription:
+          "Exporting top-quality Indian Pomegranates (Bhagwa variety) with deep red color and high sweetness. Perfect for retail and international fruit markets.",
+      },
     ];
 
     await db.collection("products").insertMany(products);

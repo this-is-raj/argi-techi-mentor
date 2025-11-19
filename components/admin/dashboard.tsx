@@ -180,7 +180,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         }
 
         // ✅ Send FormData directly (no JSON.stringify)
-        const res = await fetch(`${process.env.APP_HOST}/api/products`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_}/api/products`, {
           method: "POST",
           body: formData,
         });
