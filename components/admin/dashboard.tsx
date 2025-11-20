@@ -13,7 +13,6 @@ import {
   updateContactData,
   updateAboutData,
   updateHeaderFooterData,
-  addProduct,
   deleteProduct,
 } from "@/lib/db";
 import { Button } from "@/components/ui/button";
@@ -22,24 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Trash2, Plus, ImageIcon, Info } from "lucide-react";
-export interface Product {
-  id: string;
-  name: string;
-  subtitle: string;
-
-  image?: File | null;
-  botanicalName: string;
-  form: string;
-  packaging: string;
-  origin: string;
-  gallery?: File[];
-  specifications: Record<string, string>;
-  description: string;
-  benefits: string;
-  details: string;
-  metaTitle?: string;
-  metaDescription?: string;
-}
+import { ProductForm } from "@/types/product";
 
 export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [activeTab, setActiveTab] = useState("hero");
@@ -50,7 +32,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
   const [headerFooterData, setHeaderFooterData] = useState<any>(null);
   const [savedMsg, setSavedMsg] = useState("");
   const [loading, setLoading] = useState(true);
-  const [newProduct, setNewProduct] = useState<Product>({
+  const [newProduct, setNewProduct] = useState<ProductForm>({
     id: "",
     name: "",
     subtitle: "",
@@ -123,7 +105,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
 
   const updateProductField = (
     id: string,
-    field: keyof Product,
+    field: keyof ProductForm,
     value: string | string[] | Record<string, string>
   ) => {
     setProductsState(
@@ -180,7 +162,7 @@ export default function AdminDashboard({ onLogout }: { onLogout: () => void }) {
         }
 
         // ✅ Send FormData directly (no JSON.stringify)
-        const res = await fetch(`${process.env.NEXT_PUBLIC_}/api/products`, {
+        const res = await fetch(`${process.env.APP_HOST}/api/products`, {
           method: "POST",
           body: formData,
         });

@@ -4,14 +4,7 @@ import Footer from "@/components/footer";
 import { getAboutData } from "@/lib/db";
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-
-interface AboutData {
-  title: string;
-  description: string;
-  mission: string;
-  vision: string;
-}
-
+import { AboutData } from "@/types/about";
 export default async function AboutPage() {
   const aboutData: AboutData | null = await getAboutData();
 
@@ -54,7 +47,6 @@ export default async function AboutPage() {
 
           {/* Mission & Vision Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Mission */}
             <Card className="p-8 bg-orange-50 border-2 border-orange-200 shadow-lg">
               <div className="text-4xl mb-4">🎯</div>
               <h3 className="text-2xl font-bold text-orange-600 mb-4">
@@ -65,7 +57,6 @@ export default async function AboutPage() {
               </p>
             </Card>
 
-            {/* Vision */}
             <Card className="p-8 bg-blue-50 border-2 border-blue-200 shadow-lg">
               <div className="text-4xl mb-4">🌟</div>
               <h3 className="text-2xl font-bold text-blue-600 mb-4">

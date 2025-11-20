@@ -3,18 +3,11 @@ export const dynamic = "force-dynamic";
 import { Phone, Mail, Globe, Menu, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
-interface HeaderFooterData {
-  headerPhone: string;
-  headerEmail: string;
-  websiteName: string;
-  website: string;
-  logo: string;
-}
-
+import { HeaderData } from "@/types/header";
 export default function HeaderComponent() {
   const [openMenu, setOpenMenu] = useState(false);
 
-  const headerData: HeaderFooterData = {
+  const headerData: HeaderData = {
     headerPhone: "+91 9549235277",
     headerEmail: "info@agrotechiementor.com",
     websiteName: "Agro TechieMentor",
@@ -54,7 +47,7 @@ export default function HeaderComponent() {
               className="bg-green-500 hover:bg-green-600 p-1.5 rounded-full"
             >
               <img
-                src="/whatsappLogo.jpg"
+                src="/whatsappLogo.png"
                 alt="WhatsApp"
                 className="w-5 h-5 object-contain rounded-full"
               />
@@ -86,16 +79,16 @@ export default function HeaderComponent() {
             <Link href="#products" className="hover:text-green-600">
               Products
             </Link>
-            <Link href="/about" className="hover:text-green-600">
+            <Link href="#about" className="hover:text-green-600">
               About Us
             </Link>
-            <Link href="/quality" className="hover:text-green-600">
+            <Link href="#quality" className="hover:text-green-600">
               Quality
             </Link>
-            <Link href="/certifications" className="hover:text-green-600">
+            <Link href="#certifications" className="hover:text-green-600">
               Certifications
             </Link>
-            <Link href="/harvest-calendar" className="hover:text-green-600">
+            <Link href="#harvest-calendar" className="hover:text-green-600">
               Harvest Calendar
             </Link>
             <Link href="#contact" className="hover:text-green-600">
@@ -121,13 +114,13 @@ export default function HeaderComponent() {
             <Link href="/about" onClick={() => setOpenMenu(false)}>
               About Us
             </Link>
-            <Link href="/quality" onClick={() => setOpenMenu(false)}>
+            <Link href="#quality" onClick={() => setOpenMenu(false)}>
               Quality
             </Link>
-            <Link href="/certifications" onClick={() => setOpenMenu(false)}>
+            <Link href="#certifications" onClick={() => setOpenMenu(false)}>
               Certifications
             </Link>
-            <Link href="/harvest-calendar" onClick={() => setOpenMenu(false)}>
+            <Link href="#harvest-calendar" onClick={() => setOpenMenu(false)}>
               Harvest Calendar
             </Link>
             <Link href="#contact" onClick={() => setOpenMenu(false)}>

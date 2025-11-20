@@ -14,25 +14,7 @@ import Head from "next/head";
 import About from "@/components/about";
 import Contact from "@/components/contact";
 import { redirect } from "next/navigation";
-
-export interface Product {
-  id: string;
-  name: string;
-  subtitle: string;
-  image: string;
-  botanicalName: string;
-  form: string;
-  packaging: string;
-  origin: string;
-  gallery: string[];
-  specifications: Record<string, string>;
-  description: string;
-  benefits: string;
-  details: string;
-  category?: string;
-  metaTitle?: string;
-  metaDescription?: string;
-}
+import { Product } from "@/types/product";
 
 export default async function ProductDetailPage({
   params,
@@ -43,13 +25,10 @@ export default async function ProductDetailPage({
   const { id } = await params;
 
   const response = await fetch(
-    `${process.env.NEXT_PUBLIC_}/api/products?id=${id}`
+    `${process.env.APP_HOST}/api/products?id=${id}`
   ).catch(() => ({ ok: false } as any));
 
-  console.log(
-    "NEXT_PUBLIC_ =++++++++++++++++++++++++++++",
-    process.env.NEXT_PUBLIC_
-  );
+  console.log("APP_HOST =++++++++++++++++++++++++++++", process.env.APP_HOST);
 
   const product = response.ok ? await response.json() : null;
 
