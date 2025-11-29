@@ -3,4 +3,7 @@ export interface AboutData {
   description: string;
   mission: string;
   vision: string;
+  email?: string;
+  phone?: string;
+  address?: string;
 }

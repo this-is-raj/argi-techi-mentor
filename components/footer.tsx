@@ -1,3 +1,7 @@
+// components/footer-client.tsx
+"use client";
+
+import { useState, useEffect } from "react";
 import { getHeaderFooterData } from "@/lib/db";
 
 interface HeaderFooterData {
@@ -9,34 +13,79 @@ interface HeaderFooterData {
   website: string;
 }
 
-export default async function Footer() {
-  const footerData: HeaderFooterData = await getHeaderFooterData();
+export default function Footer() {
+  const [footerData, setFooterData] = useState<HeaderFooterData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  if (!footerData) return null;
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await getHeaderFooterData();
+        setFooterData(data);
+      } catch (error) {
+        console.error("Error fetching footer data:", error);
+        // Set fallback data
+        setFooterData({
+          websiteName: "Agro TechieMentor",
+          footerDescription:
+            "Leading exporter of premium agricultural products from India to global markets.",
+          footerAddress: "E-9/508 Chitrakoot, Jaipur, Rajasthan",
+          footerPhone: "+91 9549235277",
+          footerEmail: "techiementor.co@gmail.com",
+          website: "www.agritechimentor.com",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <footer className="bg-foreground text-white py-8 md:py-12">
+        <div className="max-w-7xl mx-auto px-3 md:px-4">
+          <div className="text-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto"></div>
+            <p className="mt-2 text-sm text-white/60">Loading footer...</p>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
+  const safeData = footerData || {
+    websiteName: "Agro TechieMentor",
+    footerDescription:
+      "Leading exporter of premium agricultural products from India to global markets.",
+    footerAddress: "E-9/508 Chitrakoot, Jaipur, Rajasthan",
+    footerPhone: "+91 9549235277",
+    footerEmail: "techiementor.co@gmail.com",
+    website: "www.agritechimentor.com",
+  };
 
   return (
     <footer className="bg-foreground text-white py-8 md:py-12">
       <div className="max-w-7xl mx-auto px-3 md:px-4">
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-4 md:gap-6 lg:gap-8 mb-6 md:mb-8">
-          {/* Brand - Show websiteName */}
           <div className="col-span-2 sm:col-span-1">
             <div className="flex items-center gap-2 mb-3 md:mb-4">
               <div className="w-8 md:w-10 h-8 md:h-10 bg-primary rounded-full flex items-center justify-center font-bold text-sm md:text-base">
-                {footerData.websiteName.charAt(0)}
+                {safeData.websiteName?.charAt(0) || "A"}
               </div>
               <div>
                 <h3 className="font-bold text-white text-xs md:text-base">
-                  {footerData.websiteName}
+                  {safeData.websiteName || "Agro TechieMentor"}
                 </h3>
                 <p className="text-xs text-white/60">Premium Ag. Products</p>
               </div>
             </div>
             <p className="text-xs md:text-sm text-white/80 leading-relaxed">
-              {footerData.footerDescription}
+              {safeData.footerDescription}
             </p>
           </div>
 
-          {/* About */}
           <div>
             <h3 className="font-bold text-sm md:text-lg mb-2 md:mb-4">About</h3>
             <ul className="space-y-1 md:space-y-2 text-white/80 text-xs md:text-sm">
@@ -55,10 +104,25 @@ export default async function Footer() {
                   Products
                 </a>
               </li>
+              <li>
+                <a
+                  href="/privacy-policy"
+                  className="hover:text-white transition"
+                >
+                  Privacy Policy
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/terms-conditions"
+                  className="hover:text-white transition"
+                >
+                  Terms & Conditions
+                </a>
+              </li>
             </ul>
           </div>
 
-          {/* Products */}
           <div>
             <h3 className="font-bold text-sm md:text-lg mb-2 md:mb-4">
               Products
@@ -82,7 +146,6 @@ export default async function Footer() {
             </ul>
           </div>
 
-          {/* Quality */}
           <div>
             <h3 className="font-bold text-sm md:text-lg mb-2 md:mb-4">
               Quality
@@ -106,27 +169,26 @@ export default async function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
             <h3 className="font-bold text-sm md:text-lg mb-2 md:mb-4">
               Get In Touch
             </h3>
             <div className="space-y-1 text-white/80 text-xs md:text-sm">
-              <p>{footerData.footerAddress}</p>
+              <p>{safeData.footerAddress}</p>
               <p className="mt-2 md:mt-3">
                 <a
-                  href={`tel:${footerData.footerPhone}`}
+                  href={`tel:${safeData.footerPhone}`}
                   className="hover:text-white transition"
                 >
-                  {footerData.footerPhone}
+                  {safeData.footerPhone}
                 </a>
               </p>
               <p>
                 <a
-                  href={`mailto:${footerData.footerEmail}`}
+                  href={`mailto:${safeData.footerEmail}`}
                   className="hover:text-white transition truncate"
                 >
-                  {footerData.footerEmail}
+                  {safeData.footerEmail}
                 </a>
               </p>
             </div>
@@ -135,15 +197,23 @@ export default async function Footer() {
 
         <div className="border-t border-white/20 pt-4 md:pt-6 lg:pt-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 text-xs md:text-sm text-white/60">
-            <p>&copy; 2025, {footerData.websiteName}. All rights reserved.</p>
+            <p>
+              &copy; {new Date().getFullYear()}, {safeData.websiteName}. All
+              rights reserved.
+            </p>
             <div className="flex flex-col sm:flex-row gap-2 md:gap-4 lg:gap-6 sm:justify-end">
               <a href="/sitemap" className="hover:text-white transition">
                 Sitemap
               </a>
-              <a href="#" className="hover:text-white transition">
+
+              <a href="/privacy-policy" className="hover:text-white transition">
                 Privacy
               </a>
-              <a href="#" className="hover:text-white transition">
+
+              <a
+                href="/terms-conditions"
+                className="hover:text-white transition"
+              >
                 Terms
               </a>
             </div>

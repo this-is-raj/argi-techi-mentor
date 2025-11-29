@@ -6,6 +6,8 @@ import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { AboutData } from "@/types/about";
 import About from "@/components/about";
+import PrivacyPolicy from "@/components/privacy-policy";
+import TermsAndConditions from "@/components/terms-conditions";
 export default async function AboutPage() {
   const aboutData: AboutData | null = await getAboutData();
 
@@ -14,11 +16,7 @@ export default async function AboutPage() {
   return (
     <main className="min-h-screen flex flex-col">
       <Header />
-
-      {/* Hero Section */}
-
-      <About />
-
+      <TermsAndConditions />
       <Footer />
     </main>
   );
