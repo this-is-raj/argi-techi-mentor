@@ -1,11 +1,30 @@
 import { MapPin, Phone, Mail, Globe } from "lucide-react";
 import { getContactData } from "@/lib/db";
 import { ContactForm } from "./ContactForm";
-
 import { ContactData } from "@/types/contact";
+
+interface Product {
+  id: string;
+  name: string;
+}
 
 export default async function Contact() {
   const contactData: ContactData = await getContactData();
+
+  // Fetch products for the dropdown
+  let products: Product[] = [];
+  try {
+    const response = await fetch(`${process.env.APP_HOST}/api/products`, {
+      next: { revalidate: 3600 }, // Revalidate every hour
+    });
+
+    if (response.ok) {
+      const productsData = await response.json();
+      products = Array.isArray(productsData) ? productsData : [];
+    }
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
+  }
 
   if (!contactData) return null;
 
@@ -74,7 +93,7 @@ export default async function Contact() {
           </div>
 
           {/* Contact Form */}
-          <ContactForm />
+          <ContactForm products={products} />
         </div>
       </div>
     </section>

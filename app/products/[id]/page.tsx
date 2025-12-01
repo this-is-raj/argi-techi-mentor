@@ -12,10 +12,8 @@ import {
   ZoomIn,
 } from "lucide-react";
 import Head from "next/head";
-import About from "@/components/about";
 import Contact from "@/components/contact";
 import { redirect } from "next/navigation";
-import { Product } from "@/types/product";
 
 export default async function ProductDetailPage({
   params,
@@ -28,8 +26,6 @@ export default async function ProductDetailPage({
   const response = await fetch(
     `${process.env.APP_HOST}/api/products?id=${id}`
   ).catch(() => ({ ok: false } as any));
-
-  console.log("APP_HOST =++++++++++++++++++++++++++++", process.env.APP_HOST);
 
   const product = response.ok ? await response.json() : null;
 
@@ -129,16 +125,6 @@ export default async function ProductDetailPage({
                 <p className="text-lg text-gray-600 font-medium">
                   {product?.subtitle}
                 </p>
-
-                {/* Quick Actions */}
-                <div className="flex flex-wrap gap-4 mt-6">
-                  <button className="bg-primary hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-semibold inline-flex items-center gap-2 transition">
-                    Request Quote <BookCheckIcon size={20} />
-                  </button>
-                  <button className="border border-primary text-primary hover:bg-primary hover:text-white px-6 py-3 rounded-lg font-semibold transition">
-                    Sample Request
-                  </button>
-                </div>
               </div>
 
               {/* Product Summary Cards */}
