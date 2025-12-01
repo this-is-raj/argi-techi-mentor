@@ -12,6 +12,8 @@ export const ContactForm = () => {
     enquiry: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -19,11 +21,42 @@ export const ContactForm = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    alert("Thank you for your enquiry! We will contact you soon.");
-    setFormData({ name: "", email: "", phone: "", city: "", enquiry: "" });
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/enquiry", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Failed to submit enquiry.");
+        setLoading(false);
+        return;
+      }
+
+      alert("Thank you for your enquiry! We will contact you soon.");
+
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        city: "",
+        enquiry: "",
+      });
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong!");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,7 +74,7 @@ export const ContactForm = () => {
           value={formData.name}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full px-4 py-2 border border-border rounded-lg"
           placeholder="Your name"
         />
       </div>
@@ -56,7 +89,7 @@ export const ContactForm = () => {
           value={formData.email}
           onChange={handleChange}
           required
-          className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full px-4 py-2 border border-border rounded-lg"
           placeholder="your@email.com"
         />
       </div>
@@ -68,7 +101,7 @@ export const ContactForm = () => {
           name="phone"
           value={formData.phone}
           onChange={handleChange}
-          className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full px-4 py-2 border border-border rounded-lg"
           placeholder="+91 XXXXXXXXXX"
         />
       </div>
@@ -80,7 +113,7 @@ export const ContactForm = () => {
           name="city"
           value={formData.city}
           onChange={handleChange}
-          className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full px-4 py-2 border border-border rounded-lg"
           placeholder="Your city"
         />
       </div>
@@ -95,16 +128,17 @@ export const ContactForm = () => {
           onChange={handleChange}
           required
           rows={4}
-          className="w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+          className="w-full px-4 py-2 border border-border rounded-lg resize-none"
           placeholder="Tell us about your inquiry..."
         />
       </div>
 
       <Button
         type="submit"
-        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
+        className="w-full bg-primary text-primary-foreground font-semibold"
+        disabled={loading}
       >
-        Submit Enquiry
+        {loading ? "Submitting..." : "Submit Enquiry"}
       </Button>
     </form>
   );

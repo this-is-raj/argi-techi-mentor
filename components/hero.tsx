@@ -1,3 +1,6 @@
+// components/Hero.tsx
+"use client";
+
 import {
   CheckCircle,
   Phone,
@@ -6,39 +9,98 @@ import {
   ArrowRight,
   Star,
   Globe,
-  Shield,
   Award,
   ChevronDown,
+  Sprout,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
-export default async function Hero() {
+interface HeroData {
+  liveLabel: string;
+  typewriterText: string;
+  headingMain: string;
+  headingGradient: string;
+  description: string;
+  highlightText: string;
+  cta_text: string;
+  image: string;
+}
+
+export default function Hero() {
+  const [data, setData] = useState<HeroData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchHeroData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch("/api/hero");
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status}`);
+        }
+
+        const heroData = await response.json();
+        setData(heroData);
+      } catch (err) {
+        console.error("Error fetching hero data:", err);
+        // Fallback to default data
+        setData({
+          liveLabel: "LIVE",
+          typewriterText:
+            "Export Quality Guaranteed • Farm Fresh • Global Shipping",
+          headingMain: "Premium Agricultural",
+          headingGradient: "Products & Exports",
+          description: "Direct from farms to global markets with",
+          highlightText: "100% quality assurance",
+          cta_text: "Explore Our Products",
+          image: "/agricultural-products-spices-vegetables-colorful-d.jpg",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchHeroData();
+  }, []);
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-green-900 to-emerald-800">
+        <div className="text-center text-white">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <p>Loading Hero Section...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (!data) return null;
+
   return (
     <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
-      {/* Background with Parallax Effect */}
+      {/* Background */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-fixed scale-105 animate-zoomInOut"
+        className="absolute inset-0 bg-cover bg-center bg-fixed scale-105"
         style={{
-          backgroundImage:
-            "url('/agricultural-products-spices-vegetables-colorful-d.jpg')",
+          backgroundImage: `url('${data.image}')`,
         }}
       />
+      <div className="absolute inset-0 bg-gradient-to-br from-green-900/80 via-emerald-800/60 to-green-700/40 backdrop-blur-[1px]" />
 
-      {/* Animated Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-emerald-900/40 to-orange-600/30 animate-gradientShift" />
-
-      {/* Floating Particles Animation - Reduced on Mobile */}
       <div className="absolute inset-0">
-        {[...Array(15)].map((_, i) => (
+        {[...Array(12)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 sm:w-2 sm:h-2 bg-green-400/30 rounded-full animate-float"
+            className="absolute w-2 h-2 bg-green-400/20 rounded-full animate-float"
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${10 + Math.random() * 10}s`,
+              animationDuration: `${15 + Math.random() * 10}s`,
             }}
           />
         ))}
@@ -47,48 +109,41 @@ export default async function Hero() {
       {/* Content */}
       <div className="relative z-10 w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center w-full max-w-4xl">
-          <div className="inline-flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-3 sm:px-4 py-1.5 sm:py-2 mb-4 sm:mb-6 animate-fadeInUp">
-            <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
-            <span className="text-white text-xs sm:text-sm font-medium">
-              Trusted by 50+ Countries
+          {/* LIVE + Typewriter */}
+          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 mb-6 animate-fadeInUp">
+            <div className="flex items-center gap-1 bg-green-600/20 px-2 py-1 rounded-lg border border-green-400/30">
+              <Sprout className="w-3 h-3 text-green-300" />
+              <span className="text-green-200 text-xs font-semibold">
+                {data.liveLabel}
+              </span>
+            </div>
+            <span className="text-white text-sm font-medium loop-typewriter">
+              {data.typewriterText}
             </span>
           </div>
 
-          <h1 className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight">
-            <span className="block animate-typing overflow-hidden whitespace-nowrap border-r-2 sm:border-r-4 border-r-white pr-1">
-              Premium Indian
-            </span>
-            <span className="block bg-gradient-to-r from-green-400 to-orange-400 bg-clip-text text-transparent animate-gradientText mt-2 sm:mt-4">
-              Spices & Agro Products
+          {/* Heading */}
+          <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+            <span className="block animate-fadeInUp">{data.headingMain}</span>
+            <span className="block bg-gradient-to-r from-green-300 via-green-400 to-green-500 bg-clip-text text-transparent mt-4 animate-gradientText">
+              {data.headingGradient}
             </span>
           </h1>
 
-          <div className="space-y-2 sm:space-y-3 mb-6 sm:mb-8">
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-gray-200 font-light animate-fadeInUp animation-delay-300 leading-relaxed">
-              Certified Quality Exporter Since 2022
-            </p>
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-4 text-xs sm:text-sm md:text-base text-gray-300 animate-fadeInUp animation-delay-500">
-              <div className="flex items-center gap-1 bg-white/5 rounded-full px-2 sm:px-3 py-1">
-                <Award className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
-                <span>ISO Certified</span>
-              </div>
-              <div className="flex items-center gap-1 bg-white/5 rounded-full px-2 sm:px-3 py-1">
-                <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-orange-400" />
-                <span>HACCP</span>
-              </div>
-              <div className="flex items-center gap-1 bg-white/5 rounded-full px-2 sm:px-3 py-1">
-                <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
-                <span>Organic</span>
-              </div>
-            </div>
-          </div>
+          {/* Description */}
+          <p className="text-lg sm:text-xl md:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto animate-fadeInUp animation-delay-300">
+            {data.description}{" "}
+            <span className="text-green-300 font-semibold">
+              {data.highlightText}
+            </span>
+          </p>
 
-          {/* Buttons - Stack on Mobile */}
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center animate-fadeInUp animation-delay-700">
+          {/* CTA buttons */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fadeInUp animation-delay-500">
             <Link href="#products" className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-sm sm:text-lg py-4 sm:py-7 px-6 sm:px-10 rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl transform hover:scale-105 transition-all duration-300 font-semibold border-2 border-green-500/30 flex items-center justify-center gap-2">
-                Explore Our Products
-                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 hover:translate-x-1 transition-transform" />
+              <Button className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-base sm:text-lg py-6 sm:py-7 px-8 sm:px-12 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 font-semibold border-2 border-green-500/30 flex items-center justify-center gap-3 group">
+                <span>{data.cta_text}</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
 
@@ -97,126 +152,133 @@ export default async function Hero() {
               target="_blank"
               className="w-full sm:w-auto"
             >
-              <Button className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm sm:text-lg py-4 sm:py-7 px-6 sm:px-10 rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl transform hover:scale-105 transition-all duration-300 font-semibold border-2 border-orange-400/30 flex items-center justify-center gap-2">
-                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span>WhatsApp Quote</span>
+              <Button className="w-full sm:w-auto bg-white/10 backdrop-blur-md hover:bg-white/20 text-white text-base sm:text-lg py-6 sm:py-7 px-8 sm:px-12 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 font-semibold border-2 border-white/20 flex items-center justify-center gap-3 group">
+                <MessageCircle className="w-5 h-5" />
+                <span>Export Enquiry</span>
               </Button>
             </Link>
           </div>
 
-          {/* Trust Indicators - Grid Layout for All Screens */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mt-8 sm:mt-12 animate-fadeInUp animation-delay-1000">
+          {/* Stats & Features */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-12 animate-fadeInUp animation-delay-700">
             {[
-              { icon: Award, label: "Quality", value: "100%" },
-              { icon: Globe, label: "Countries", value: "50+" },
-              { icon: Star, label: "Clients", value: "500+" },
-              { icon: CheckCircle, label: "Products", value: "100+" },
+              {
+                icon: Award,
+                label: "Quality Certified",
+                value: "100%",
+                color: "text-green-400",
+              },
+              {
+                icon: Globe,
+                label: "Export Countries",
+                value: "10+",
+                color: "text-blue-400",
+              },
+              {
+                icon: Star,
+                label: "Happy Clients",
+                value: "45+",
+                color: "text-yellow-400",
+              },
+              {
+                icon: CheckCircle,
+                label: "Farm Products",
+                value: "20+",
+                color: "text-emerald-400",
+              },
             ].map((item, index) => (
               <div
                 key={index}
-                className="text-center group hover:scale-105 transition-transform duration-300 p-2 sm:p-0"
+                className="text-center group hover:scale-105 transition-all duration-300 p-4 bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 hover:border-green-400/30"
               >
-                <div className="flex justify-center mb-1 sm:mb-2">
-                  <div className="p-1 sm:p-2 bg-white/10 rounded-full group-hover:bg-green-500/20 transition-colors">
-                    <item.icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-green-400" />
+                <div className="flex justify-center mb-3">
+                  <div className="p-2 bg-white/10 rounded-xl group-hover:bg-green-500/20 transition-colors">
+                    <item.icon className={`w-6 h-6 ${item.color}`} />
                   </div>
                 </div>
-                <div className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-0.5 sm:mb-1">
+                <div className="text-2xl font-bold text-white mb-1">
                   {item.value}
                 </div>
-                <div className="text-[10px] xs:text-xs text-gray-300 uppercase tracking-wider">
+                <div className="text-xs text-gray-300 uppercase tracking-wider font-medium">
                   {item.label}
                 </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-4 mt-8 animate-fadeInUp animation-delay-900">
+            {[
+              "Farm Fresh Quality",
+              "Global Shipping",
+              "ISO Certified",
+              "Best Prices",
+            ].map((feature, index) => (
+              <div
+                key={index}
+                className="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-full border border-white/10"
+              >
+                <span className="text-green-400 text-sm">✓</span>
+                <span className="text-white text-sm font-medium">
+                  {feature}
+                </span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Floating Contact Info - Mobile Optimized */}
-      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20 animate-fadeInRight">
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-lg sm:rounded-2xl p-2 sm:p-4 shadow-lg sm:shadow-2xl">
-          <div className="space-y-2 sm:space-y-3 text-white text-xs sm:text-sm">
-            <div className="flex items-center gap-2 sm:gap-3 hover:text-green-300 transition-colors cursor-pointer group">
-              <div className="p-1 sm:p-2 bg-green-500/20 rounded-full group-hover:bg-green-500/30 transition-colors">
-                <Phone className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
-              </div>
-              <span className="group-hover:underline font-medium whitespace-nowrap">
-                +91 95492 35277
-              </span>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-3 hover:text-orange-300 transition-colors cursor-pointer group">
-              <div className="p-1 sm:p-2 bg-orange-500/20 rounded-full group-hover:bg-orange-500/30 transition-colors">
-                <Mail className="w-3 h-3 sm:w-4 sm:h-4 text-orange-400" />
-              </div>
-              <span className="group-hover:underline font-medium whitespace-nowrap text-xs sm:text-sm">
-                info@agritechmentor.com
-              </span>
-            </div>
+      {/* Scroll Down */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-white/70 text-sm font-medium">
+            Explore More
+          </span>
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
+            <ChevronDown className="w-4 h-4 text-white/60 mt-2 animate-pulse" />
           </div>
         </div>
       </div>
 
-      {/* Quality Badges - Mobile Optimized */}
-      <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-20 animate-fadeInLeft">
-        <div className="flex flex-col gap-2 sm:gap-3">
-          {[
-            { icon: Award, text: "ISO", color: "text-blue-400" },
-            { icon: Shield, text: "HACCP", color: "text-green-400" },
-            { icon: CheckCircle, text: "Organic", color: "text-emerald-400" },
-          ].map((badge, index) => (
-            <div
-              key={index}
-              className="flex items-center gap-1 sm:gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-2 sm:px-3 py-1 sm:py-2 animate-fadeInLeft"
-              style={{ animationDelay: `${1200 + index * 200}ms` }}
-            >
-              <badge.icon className={`w-3 h-3 sm:w-4 sm:h-4 ${badge.color}`} />
-              <span className="text-white text-xs font-medium hidden xs:inline">
-                {badge.text}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
-        <div className="w-5 h-8 sm:w-6 sm:h-10 border-2 border-white/50 rounded-full flex justify-center">
-          <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 text-white/70 mt-1 sm:mt-2 animate-pulse" />
-        </div>
-      </div>
-
-      {/* Mobile Bottom Bar for Important Actions */}
-      <div className="fixed bottom-0 left-0 right-0 z-30 bg-black/80 backdrop-blur-md border-t border-white/20 sm:hidden">
+      {/* Bottom mobile bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-30 bg-black/90 backdrop-blur-md border-t border-green-500/20 sm:hidden">
         <div className="flex justify-around items-center p-3">
-          <Link
-            href="tel:+919549235277"
-            className="flex flex-col items-center gap-1 text-white"
-          >
-            <Phone className="w-5 h-5 text-green-400" />
-            <span className="text-xs">Call</span>
-          </Link>
-          <Link
-            href="https://wa.me/919549235277"
-            className="flex flex-col items-center gap-1 text-white"
-          >
-            <MessageCircle className="w-5 h-5 text-green-400" />
-            <span className="text-xs">WhatsApp</span>
-          </Link>
-          <Link
-            href="mailto:info@agritechmentor.com"
-            className="flex flex-col items-center gap-1 text-white"
-          >
-            <Mail className="w-5 h-5 text-orange-400" />
-            <span className="text-xs">Email</span>
-          </Link>
-          <Link
-            href="#products"
-            className="flex flex-col items-center gap-1 text-white"
-          >
-            <Award className="w-5 h-5 text-green-400" />
-            <span className="text-xs">Products</span>
-          </Link>
+          {[
+            {
+              icon: Phone,
+              label: "Call",
+              href: "tel:+919549235277",
+              color: "text-green-400",
+            },
+            {
+              icon: MessageCircle,
+              label: "WhatsApp",
+              href: "https://wa.me/919549235277",
+              color: "text-green-400",
+            },
+            {
+              icon: Mail,
+              label: "Email",
+              href: "mailto:info@agrotechiementor.com",
+              color: "text-green-400",
+            },
+            {
+              icon: Award,
+              label: "Products",
+              href: "#products",
+              color: "text-green-400",
+            },
+          ].map((item, index) => (
+            <Link
+              key={index}
+              href={item.href}
+              className="flex flex-col items-center gap-1 text-white group"
+            >
+              <div className="p-2 bg-green-600/20 rounded-lg group-hover:bg-green-600/30 transition-colors">
+                <item.icon className={`w-4 h-4 ${item.color}`} />
+              </div>
+              <span className="text-xs font-medium">{item.label}</span>
+            </Link>
+          ))}
         </div>
       </div>
     </section>

@@ -134,8 +134,9 @@ export async function getAboutData(): Promise<AboutData> {
     description:
       "We are a leading exporter of premium agricultural products from India, committed to quality and sustainability.",
     mission:
-      "To provide the highest quality agricultural products to global markets",
-    vision: "To be the most trusted agricultural export company in the world",
+      "To deliver premium, sustainably sourced agricultural products from India’s farms to global markets, ensuring quality, freshness, and customer satisfaction every step of the way",
+    vision:
+      "To become the world’s most trusted partner in agricultural exports, leading the industry in innovation, sustainability, and quality while connecting Indian farmers to international opportunities",
   };
 }
 

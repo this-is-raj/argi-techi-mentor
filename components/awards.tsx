@@ -59,7 +59,7 @@ export default function Awards() {
           {/* Harvest Calendar */}
           <div className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition">
             <img
-              src="/certifications/haccp.avif"
+              src="/certifications/haccp.webp"
               alt="HACCP"
               className="h-20 w-auto mx-auto mb-6 object-contain"
             />
@@ -75,14 +75,10 @@ export default function Awards() {
 
         {/* Certifications Section */}
         <div className="bg-white p-10 rounded-2xl shadow-lg">
-          <h3 className="text-3xl font-bold mb-10 text-center">
-            Our Certifications & Memberships
-          </h3>
-
           {/* Logo Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 place-items-center">
             {[
-              { src: "/certifications/fssai.webp", alt: "FSSAI" },
+              { src: "/certifications/fssai.jpg", alt: "FSSAI" },
               { src: "/certifications/usda-organic.gif", alt: "USDA Organic" },
               { src: "/certifications/eu-organic.png", alt: "EU Organic" },
               { src: "/certifications/halal.jpg", alt: "Halal" },
@@ -96,6 +92,58 @@ export default function Awards() {
                 className="h-14 w-auto object-contain opacity-90 hover:opacity-100 transition"
               />
             ))}
+          </div>
+        </div>
+        <div className="bg-white p-12 md:p-16 rounded-3xl shadow-xl border border-gray-100 mt-10">
+          {/* Heading */}
+          <div className="text-center mb-14">
+            <h2 className="text-4xl font-extrabold text-gray-900 mb-4">
+              Official Compliance Details
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Transparent business operations with all required government
+              registrations and compliance certifications.
+            </p>
+          </div>
+
+          {/* List */}
+          <div className="max-w-4xl mx-auto space-y-6">
+            {/* Item */}
+            <div className="flex justify-between items-center bg-gray-50 p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+              <span className="text-gray-700 font-semibold text-lg">
+                IEC Number
+              </span>
+              <span className="text-gray-900 font-bold text-lg">
+                AAXFT8546M
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center bg-gray-50 p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+              <span className="text-gray-700 font-semibold text-lg">
+                APEDA Reg No
+              </span>
+              <span className="text-gray-900 font-bold text-lg">
+                RCMC/APEDA/21325/2025-2026
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center bg-gray-50 p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+              <span className="text-gray-700 font-semibold text-lg">
+                FSSAI License
+              </span>
+              <span className="text-gray-900 font-bold text-lg">
+                12225999000503
+              </span>
+            </div>
+
+            <div className="flex justify-between items-center bg-gray-50 p-6 rounded-2xl shadow-sm hover:shadow-md transition">
+              <span className="text-gray-700 font-semibold text-lg">
+                GST Number
+              </span>
+              <span className="text-gray-900 font-bold text-lg">
+                08AAXFT8546M1ZY
+              </span>
+            </div>
           </div>
         </div>
       </div>

@@ -83,12 +83,12 @@ async function seedDatabase() {
         id: "3",
         name: "Green Banana",
         subtitle: "Fresh Export Quality",
-        image: "/p2.jpg",
+        image: "/p1.jpeg",
         botanicalName: "Musa acuminata",
         form: "Fresh Raw Bananas",
         packaging: "7 kg / 13 kg / 20 kg Corrugated Export Boxes",
         origin: "Tamil Nadu, Maharashtra & Andhra Pradesh, India",
-        gallery: ["/p1.jpg", "/p2.jpeg", "/p3.jpg"],
+        gallery: ["/p1.jpeg", "/p2.jpeg", "/p3.jpg"],
         specifications: {
           Size: "14 cm – 20 cm (Uniform Size)",
           Color: "Natural Green",
@@ -158,8 +158,9 @@ async function seedDatabase() {
       description:
         "We are a leading exporter of premium agricultural products from India, committed to quality and sustainability.",
       mission:
-        "To provide the highest quality agricultural products to global markets",
-      vision: "To be the most trusted agricultural export company in the world",
+        "To deliver premium, sustainably sourced agricultural products from India’s farms to global markets, ensuring quality, freshness, and customer satisfaction every step of the way",
+      vision:
+        "To become the world’s most trusted partner in agricultural exports, leading the industry in innovation, sustainability, and quality while connecting Indian farmers to international opportunities",
     });
     console.log("[v0] About data seeded");
 

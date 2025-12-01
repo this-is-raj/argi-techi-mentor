@@ -8,8 +8,8 @@ export const MobileMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <>z
-      {/* Mobile Menu Button */}
+    <>
+      z{/* Mobile Menu Button */}
       <button
         className="md:hidden p-1 -mr-1"
         onClick={() => setIsOpen(!isOpen)}
@@ -42,6 +42,20 @@ export const MobileMenu = () => {
             >
               Contact
             </a>
+            <li>
+              <a href="/privacy-policy" className="hover:text-white transition">
+                Privacy Policy
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="/terms-conditions"
+                className="hover:text-white transition"
+              >
+                Terms & Conditions
+              </a>
+            </li>
             <Link
               href="/agritechimentoradmin"
               className="block bg-orange-600 text-white hover:bg-orange-700 py-2 px-3 rounded transition font-medium text-sm"
