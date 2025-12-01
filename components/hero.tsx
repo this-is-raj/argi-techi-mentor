@@ -227,18 +227,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Scroll Down */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 animate-bounce">
-        <div className="flex flex-col items-center gap-2">
-          <span className="text-white/70 text-sm font-medium">
-            Explore More
-          </span>
-          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center">
-            <ChevronDown className="w-4 h-4 text-white/60 mt-2 animate-pulse" />
-          </div>
-        </div>
-      </div>
-
       {/* Bottom mobile bar */}
       <div className="fixed bottom-0 left-0 right-0 z-30 bg-black/90 backdrop-blur-md border-t border-green-500/20 sm:hidden">
         <div className="flex justify-around items-center p-3">
