@@ -120,7 +120,7 @@ export async function getContactData(): Promise<ContactData> {
 
 export async function getAboutData(): Promise<AboutData> {
   try {
-    const response = await fetch(`${process.env.APP_HOST}/api/about`, {
+    const response = await fetch(`${process.env.APP_HOST}/api/updateAboutUs`, {
       cache: "no-store",
     });
     if (response.ok) {
@@ -180,7 +180,7 @@ export async function updateContactData(data: ContactData) {
 
 export async function updateAboutData(data: AboutData) {
   try {
-    await fetch(`${process.env.APP_HOST}/api/about`, {
+    await fetch(`${process.env.APP_HOST}/api/updateAboutUs`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),

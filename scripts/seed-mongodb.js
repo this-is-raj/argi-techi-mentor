@@ -107,7 +107,6 @@ async function seedDatabase() {
         metaDescription:
           "Supplying fresh, export-quality Green Bananas with superior shelf life and perfect size. Ideal for retail and wholesale export markets.",
       },
-
       {
         id: "4",
         name: "Pomegranate",

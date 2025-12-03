@@ -43,7 +43,7 @@ export default function HeroTab({
   const fetchHeroData = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/hero");
+      const response = await fetch(`/api/hero`);
       if (response.ok) {
         const data = await response.json();
         setFormData(data);
@@ -70,7 +70,7 @@ export default function HeroTab({
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      const response = await fetch("/api/hero", {
+      const response = await fetch(`/api/hero`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -67,41 +67,6 @@ export default function HeaderComponent() {
 
   return (
     <>
-      {/* Premium Agricultural Top Bar */}
-      {/* <div className="bg-gradient-to-r from-green-800 via-green-700 to-green-800 text-white py-2 px-4 text-sm border-b border-green-600">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex items-center gap-3">
-             <div className="flex items-center gap-1 bg-green-900/30 px-2 py-1 rounded-lg border border-green-600/30">
-                <Sprout className="w-3 h-3 text-green-300" />
-                <span className="text-green-200 text-xs font-semibold">
-                  LIVE
-                </span>
-              </div>
-              <div className="min-h-[20px] flex items-center">
-                <span className="text-green-100 font-medium">
-                  {typingText}
-                  <span className="ml-0.5 animate-pulse">|</span>
-                </span>
-              </div>
-            </div>
-
-           
-            <div className="flex items-center gap-4 text-xs">
-              <div className="hidden sm:flex items-center gap-1">
-                <Truck className="w-3 h-3 text-green-300" />
-                <span className="text-green-200">Global Export</span>
-              </div>
-              <div className="hidden md:flex items-center gap-1">
-                <span className="w-1 h-1 bg-green-400 rounded-full"></span>
-                <span className="text-green-100">ISO Certified</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> */}
-
-      {/* Main Navigation */}
       <nav
         className={`bg-white/95 backdrop-blur-md sticky top-0 z-50 transition-all duration-300 border-b ${
           scrolled ? "shadow-lg py-1 border-gray-200" : "py-3 border-gray-100"
@@ -220,7 +185,7 @@ export default function HeaderComponent() {
         href="https://wa.me/919549235277"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-green-600 to-green-700 p-4 rounded-2xl shadow-2xl hover:shadow-3xl z-[999] group transition-all duration-300 hover:scale-110 border border-green-500"
+        className="fixed bottom-16 right-6 bg-gradient-to-r from-green-600 to-green-700 p-4 rounded-2xl shadow-2xl hover:shadow-3xl z-[999] group transition-all duration-300 hover:scale-110 border border-green-500"
         aria-label="Contact on WhatsApp"
       >
         <div className="relative">
@@ -230,6 +195,7 @@ export default function HeaderComponent() {
             <div className="absolute bottom-[-4px] left-1/2 transform -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
           </div>
         </div>
+
         <div className="absolute top-0 right-0 w-3 h-3 bg-white rounded-full animate-ping"></div>
         <div className="absolute top-1 right-1 w-2 h-2 bg-white rounded-full"></div>
       </a>

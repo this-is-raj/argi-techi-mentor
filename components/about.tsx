@@ -3,8 +3,48 @@ import { AboutData } from "@/types/about";
 import Image from "next/image";
 
 export default async function About() {
-  const aboutData: AboutData = await getAboutData();
+  const aboutData: AboutData | null = await getAboutData();
   if (!aboutData) return null;
+
+  // Default features if none exist
+  const defaultFeatures = [
+    {
+      icon: "/AboutUsImage/QualityAssured.jpg",
+      title: "Quality Assured",
+      desc: "100% certified premium products",
+      color: "text-orange-500",
+      bgColor: "bg-orange-500/10",
+    },
+    {
+      icon: "/AboutUsImage/Global-Reach.jpg",
+      title: "Global Reach",
+      desc: "Exporting to 50+ countries worldwide",
+      color: "text-blue-500",
+      bgColor: "bg-blue-500/10",
+    },
+    {
+      icon: "/AboutUsImage/FastDelivery.jpeg",
+      title: "Fast Delivery",
+      desc: "Secure & reliable shipping services",
+      color: "text-green-500",
+      bgColor: "bg-green-500/10",
+    },
+    {
+      icon: "/AboutUsImage/Trusted-partner.jpg",
+      title: "Trusted Partner",
+      desc: "Customer-first export experience",
+      color: "text-purple-500",
+      bgColor: "bg-purple-500/10",
+    },
+  ];
+
+  const features = aboutData.features || defaultFeatures;
+  const stats = aboutData.stats || {
+    countries: 10,
+    clients: 45,
+    experience: 5,
+    support: "24/7",
+  };
 
   return (
     <section className="py-20 bg-gradient-to-b from-white to-gray-100">
@@ -32,11 +72,11 @@ export default async function About() {
                     alt="Mission"
                     width={90}
                     height={90}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover rounded-full"
                   />
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 ">Our Mission</h3>
+              <h3 className="text-2xl font-bold text-gray-900">Our Mission</h3>
             </div>
 
             <p className="text-gray-600 text-lg leading-relaxed">
@@ -71,36 +111,7 @@ export default async function About() {
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: "/AboutUsImage/QualityAssured.jpg",
-                title: "Quality Assured",
-                desc: "100% certified premium products",
-                color: "text-orange-500",
-                bgColor: "bg-orange-500/10",
-              },
-              {
-                icon: "/AboutUsImage/Global-Reach.jpg",
-                title: "Global Reach",
-                desc: "Exporting to 50+ countries worldwide",
-                color: "text-blue-500",
-                bgColor: "bg-blue-500/10",
-              },
-              {
-                icon: "/AboutUsImage/FastDelivery.jpeg",
-                title: "Fast Delivery",
-                desc: "Secure & reliable shipping services",
-                color: "text-green-500",
-                bgColor: "bg-green-500/10",
-              },
-              {
-                icon: "/AboutUsImage/Trusted-partner.jpg",
-                title: "Trusted Partner",
-                desc: "Customer-first export experience",
-                color: "text-purple-500",
-                bgColor: "bg-purple-500/10",
-              },
-            ].map((item, i) => (
+            {features.map((item, i) => (
               <div
                 key={i}
                 className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 text-center hover:-translate-y-1 hover:shadow-2xl transition-all duration-300"
@@ -121,31 +132,42 @@ export default async function About() {
                 <h4 className="text-lg font-semibold text-gray-900 mb-2">
                   {item.title}
                 </h4>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  {item.desc}
-                </p>
+                {/* <p className="text-gray-600 text-sm leading-relaxed">
+                  {item.description || item.desc}
+                </p> */}
               </div>
             ))}
           </div>
         </div>
 
-        <div className="mt-20 bg-primary rounded-2xl p-10 text-white">
+        <div className="mt-20 bg-white rounded-2xl p-10 text-green-700 shadow-md border border-green-200">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-3xl md:text-4xl font-bold mb-2">10+</div>
-              <div className="text-green-100">Countries Served</div>
+              <div className="text-3xl md:text-4xl font-bold mb-1 text-green-700">
+                {stats.countries}+
+              </div>
+              <div className="text-green-500 font-medium">Countries Served</div>
             </div>
+
             <div>
-              <div className="text-3xl md:text-4xl font-bold mb-2">45+</div>
-              <div className="text-green-100">Happy Clients</div>
+              <div className="text-3xl md:text-4xl font-bold mb-1 text-green-700">
+                {stats.clients}+
+              </div>
+              <div className="text-green-500 font-medium">Happy Clients</div>
             </div>
+
             <div>
-              <div className="text-3xl md:text-4xl font-bold mb-2">5+</div>
-              <div className="text-green-100">Years Experience</div>
+              <div className="text-3xl md:text-4xl font-bold mb-1 text-green-700">
+                {stats.experience}+
+              </div>
+              <div className="text-green-500 font-medium">Years Experience</div>
             </div>
+
             <div>
-              <div className="text-3xl md:text-4xl font-bold mb-2">24/7</div>
-              <div className="text-green-100">Customer Support</div>
+              <div className="text-3xl md:text-4xl font-bold mb-1 text-green-700">
+                {stats.support}
+              </div>
+              <div className="text-green-500 font-medium">Customer Support</div>
             </div>
           </div>
         </div>

@@ -1,3 +1,15 @@
+"use client";
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
+
+interface HarvestProduct {
+  _id?: string;
+  name: string;
+  months: number[];
+  color: string;
+  image: string;
+}
+
 export default function HarvestCalendar() {
   const months = [
     { name: "Jan", full: "January" },
@@ -14,55 +26,37 @@ export default function HarvestCalendar() {
     { name: "Dec", full: "December" },
   ];
 
-  const harvestData = [
-    {
-      name: "Turmeric",
-      months: [0, 1, 2], // Jan-Mar
-      color: "bg-amber-500",
-      image: "/turmeric.png",
-    },
-    {
-      name: "Cardamom",
-      months: [7, 8, 9, 10], // Aug-Nov
-      color: "bg-emerald-500",
-      image: "/cardamom.png",
-    },
-    {
-      name: "Black Pepper",
-      months: [2, 3, 4], // Mar-May
-      color: "bg-gray-800",
-      image: "/black-pepper.jpeg",
-    },
-    {
-      name: "Cumin",
-      months: [0, 1, 11], // Jan, Feb, Dec
-      color: "bg-yellow-600",
-      image: "/cumin-seeds.avif",
-    },
-    {
-      name: "Groundnut",
-      months: [8, 9, 10], // Sep-Nov
-      color: "bg-orange-400",
-      image: "/groundnut.png",
-    },
-    {
-      name: "Rice",
-      months: [9, 10, 11], // Oct-Dec
-      color: "bg-white border border-gray-300",
-      image: "/rice.png",
-    },
-    {
-      name: "Chillies",
-      months: [1, 2, 3, 10, 11], // Feb-Apr, Nov-Dec
-      color: "bg-red-500",
-      image: "/chillies.png",
-    },
-  ];
+  const [harvestData, setHarvestData] = useState<HarvestProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchHarvestData();
+  }, []);
+
+  const fetchHarvestData = async () => {
+    try {
+      const response = await fetch(`/api/harvest-calendar`);
+      if (!response.ok) throw new Error("Failed to fetch data");
+      const data = await response.json();
+      setHarvestData(data);
+    } catch (error) {
+      console.error("Error fetching harvest data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+      </div>
+    );
+  }
 
   return (
     <section className="py-16 px-4 bg-gradient-to-br from-green-50 to-blue-50">
       <div className="max-w-7xl mx-auto">
-        {/* Header Section */}
         <div className="text-center mb-12">
           <span className="text-green-600 uppercase tracking-widest text-sm font-semibold mb-3 block">
             Farming Schedule
@@ -76,9 +70,7 @@ export default function HarvestCalendar() {
           </p>
         </div>
 
-        {/* Calendar Container */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-          {/* Table Header */}
           <div className="bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4">
             <div className="flex items-center justify-between">
               <h3 className="text-white text-xl font-semibold">
@@ -93,7 +85,6 @@ export default function HarvestCalendar() {
             </div>
           </div>
 
-          {/* Calendar Table */}
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -118,41 +109,52 @@ export default function HarvestCalendar() {
               </thead>
 
               <tbody>
-                {harvestData.map((product, rowIndex) => (
+                {harvestData.map((product) => (
                   <tr
-                    key={rowIndex}
+                    key={product._id}
                     className="border-b border-gray-100 hover:bg-green-50/50 transition-colors duration-200"
                   >
-                    {/* Product Cell */}
                     <td className="py-4 px-6">
                       <div className="flex items-center space-x-3">
                         <div
                           className={`w-10 h-10 rounded-lg ${product.color} flex items-center justify-center shadow-sm`}
                         >
-                          <img
-                            src={product.image}
-                            alt={product.name}
-                            className="w-6 h-6 object-contain"
-                          />
+                          {product.image ? (
+                            <img
+                              src={product.image}
+                              alt={product.name}
+                              className="w-8 h-8 object-contain"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display =
+                                  "none";
+                                const parent = (e.target as HTMLImageElement)
+                                  .parentElement;
+                                if (parent) {
+                                  parent.innerHTML = `<span class="text-white text-sm font-bold">${product.name.charAt(
+                                    0
+                                  )}</span>`;
+                                }
+                              }}
+                            />
+                          ) : (
+                            <span className="text-white text-sm font-bold">
+                              {product.name.charAt(0)}
+                            </span>
+                          )}
                         </div>
                         <div>
                           <span className="font-semibold text-gray-900 block">
                             {product.name}
                           </span>
-                          <span className="text-xs text-gray-500">
-                            {product.months.length} month
-                            {product.months.length > 1 ? "s" : ""}
-                          </span>
                         </div>
                       </div>
                     </td>
 
-                    {/* Month Cells */}
                     {months.map((_, monthIndex) => {
                       const isHarvestMonth =
                         product.months.includes(monthIndex);
                       const isPeakMonth =
-                        product.months.includes(monthIndex) &&
+                        isHarvestMonth &&
                         (monthIndex === product.months[0] ||
                           monthIndex ===
                             product.months[product.months.length - 1]);
@@ -201,7 +203,6 @@ export default function HarvestCalendar() {
             </table>
           </div>
 
-          {/* Table Footer */}
           <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
             <div className="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
               <div className="flex items-center space-x-4 text-sm text-gray-600">

@@ -1,7 +1,5 @@
-// app/api/hero/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-// Mock database (replace with real database in production)
 let heroData = {
   liveLabel: "LIVE",
   typewriterText: "Export Quality Guaranteed • Farm Fresh • Global Shipping",
@@ -28,7 +26,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Validate required fields
     const requiredFields = [
       "liveLabel",
       "typewriterText",
@@ -49,7 +46,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Update the data
     heroData = { ...body };
 
     return NextResponse.json({

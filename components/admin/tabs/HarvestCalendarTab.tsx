@@ -4,11 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trash2, Plus, ImageIcon, Calendar, Loader2 } from "lucide-react";
+import { Trash2, Plus, Calendar, Loader2, Edit2, X } from "lucide-react";
 
 interface HarvestProduct {
-  id?: string;
-  _id?: string;
+  _id: string;
   name: string;
   months: number[];
   color: string;
@@ -32,21 +31,24 @@ export default function HarvestCalendarTab() {
   ];
 
   const [harvestData, setHarvestData] = useState<HarvestProduct[]>([]);
-  const [newProduct, setNewProduct] = useState<HarvestProduct>({
+  const [newProduct, setNewProduct] = useState<
+    Omit<HarvestProduct, "_id"> & { _id?: string }
+  >({
     name: "",
     months: [],
     color: "bg-gray-500",
     image: "",
   });
+  const [editingProduct, setEditingProduct] = useState<HarvestProduct | null>(
+    null
+  );
   const [savedMsg, setSavedMsg] = useState("");
   const [activeTab, setActiveTab] = useState("view");
   const [loading, setLoading] = useState(false);
   const [addingProduct, setAddingProduct] = useState(false);
 
-  // API base URL
-  const API_BASE = "/api/harvest-calendar";
+  const api_BASE = `/api/harvest-calendar`;
 
-  // Load data from API on component mount
   useEffect(() => {
     fetchHarvestData();
   }, []);
@@ -54,134 +56,147 @@ export default function HarvestCalendarTab() {
   const fetchHarvestData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(API_BASE);
-      if (!response.ok) {
-        throw new Error("Failed to fetch data");
-      }
+      const response = await fetch(api_BASE);
+      if (!response.ok) throw new Error("Failed to fetch data");
       const data = await response.json();
       setHarvestData(data);
     } catch (error) {
       console.error("Error fetching harvest data:", error);
-      setSavedMsg("Error loading harvest data");
-      setTimeout(() => setSavedMsg(""), 3000);
+      showMessage("Error loading harvest data", "error");
     } finally {
       setLoading(false);
     }
   };
 
+  const showMessage = (
+    message: string,
+    type: "success" | "error" = "success"
+  ) => {
+    setSavedMsg(message);
+    setTimeout(() => setSavedMsg(""), 3000);
+  };
+
   const handleAddProduct = async () => {
-    if (newProduct.name && newProduct.months.length > 0) {
-      setAddingProduct(true);
-      try {
-        const response = await fetch(API_BASE, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newProduct),
-        });
+    if (!newProduct.name || newProduct.months.length === 0) {
+      showMessage("Please fill all required fields", "error");
+      return;
+    }
 
-        if (!response.ok) {
-          throw new Error("Failed to add product");
-        }
+    setAddingProduct(true);
+    const formData = new FormData();
+    formData.append("name", newProduct.name);
+    formData.append("color", newProduct.color);
+    formData.append("months", JSON.stringify(newProduct.months));
 
-        const result = await response.json();
+    // Handle image file
+    const imageInput = document.getElementById(
+      "imageInput"
+    ) as HTMLInputElement;
+    if (imageInput?.files?.[0]) {
+      formData.append("image", imageInput.files[0]);
+    }
 
-        if (result.success) {
-          // Refresh the data to get the new product with _id
-          await fetchHarvestData();
-          setNewProduct({
-            name: "",
-            months: [],
-            color: "bg-gray-500",
-            image: "",
-          });
-          setSavedMsg("Product added successfully!");
-          setTimeout(() => setSavedMsg(""), 3000);
-        }
-      } catch (error) {
-        console.error("Error adding product:", error);
-        setSavedMsg("Error adding product");
-        setTimeout(() => setSavedMsg(""), 3000);
-      } finally {
-        setAddingProduct(false);
-      }
+    try {
+      const response = await fetch(api_BASE, {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) throw new Error(result.error);
+
+      await fetchHarvestData();
+      setNewProduct({
+        name: "",
+        months: [],
+        color: "bg-gray-500",
+        image: "",
+      });
+
+      // Clear file input
+      if (imageInput) imageInput.value = "";
+
+      showMessage("Product added successfully!");
+    } catch (error: any) {
+      console.error("Error adding product:", error);
+      showMessage(error.message || "Error adding product", "error");
+    } finally {
+      setAddingProduct(false);
     }
   };
 
   const handleDeleteProduct = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
     try {
-      const response = await fetch(`${API_BASE}?id=${id}`, {
+      const response = await fetch(`${api_BASE}?id=${id}`, {
         method: "DELETE",
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to delete product");
-      }
-
       const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
 
-      if (result.success) {
-        setHarvestData(
-          harvestData.filter(
-            (product) => product._id !== id && product.id !== id
-          )
-        );
-        setSavedMsg("Product deleted!");
-        setTimeout(() => setSavedMsg(""), 3000);
-      }
-    } catch (error) {
+      setHarvestData(harvestData.filter((product) => product._id !== id));
+      showMessage("Product deleted successfully!");
+    } catch (error: any) {
       console.error("Error deleting product:", error);
-      setSavedMsg("Error deleting product");
-      setTimeout(() => setSavedMsg(""), 3000);
+      showMessage(error.message || "Error deleting product", "error");
     }
   };
 
-  const toggleMonth = (monthIndex: number) => {
-    setNewProduct((prev) => ({
-      ...prev,
-      months: prev.months.includes(monthIndex)
-        ? prev.months.filter((m) => m !== monthIndex)
-        : [...prev.months, monthIndex].sort((a, b) => a - b),
-    }));
-  };
+  const handleUpdateProduct = async (product: HarvestProduct) => {
+    if (!product._id || !product.name || product.months.length === 0) {
+      showMessage("Please fill all required fields", "error");
+      return;
+    }
 
-  const updateProductField = async (
-    id: string,
-    field: keyof HarvestProduct,
-    value: any
-  ) => {
+    const formData = new FormData();
+    formData.append("name", product.name);
+    formData.append("color", product.color);
+    formData.append("months", JSON.stringify(product.months));
+
+    // Handle image file for update
+    const imageInput = document.getElementById(
+      `imageInput-${product._id}`
+    ) as HTMLInputElement;
+    if (imageInput?.files?.[0]) {
+      formData.append("image", imageInput.files[0]);
+    }
+
     try {
-      const response = await fetch(API_BASE, {
+      const response = await fetch(`${api_BASE}?id=${product._id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          id,
-          field,
-          value,
-        }),
+        body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update product");
-      }
-
       const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
 
-      if (result.success) {
-        const updatedData = harvestData.map((product) =>
-          product._id === id || product.id === id
-            ? { ...product, [field]: value }
-            : product
-        );
-        setHarvestData(updatedData);
-      }
-    } catch (error) {
+      await fetchHarvestData();
+      setEditingProduct(null);
+      showMessage("Product updated successfully!");
+    } catch (error: any) {
       console.error("Error updating product:", error);
-      setSavedMsg("Error updating product");
-      setTimeout(() => setSavedMsg(""), 3000);
+      showMessage(error.message || "Error updating product", "error");
+    }
+  };
+
+  const toggleMonth = (monthIndex: number, product?: HarvestProduct) => {
+    if (product && editingProduct?._id === product._id && editingProduct) {
+      setEditingProduct({
+        ...editingProduct,
+        months: editingProduct.months.includes(monthIndex)
+          ? editingProduct.months.filter((m) => m !== monthIndex)
+          : [...editingProduct.months, monthIndex].sort((a, b) => a - b),
+      });
+    } else {
+      setNewProduct((prev) => ({
+        ...prev,
+        months: prev.months.includes(monthIndex)
+          ? prev.months.filter((m) => m !== monthIndex)
+          : [...prev.months, monthIndex].sort((a, b) => a - b),
+      }));
     }
   };
 
@@ -198,26 +213,12 @@ export default function HarvestCalendarTab() {
     { value: "bg-gray-800", label: "Dark Gray" },
     { value: "bg-orange-500", label: "Orange" },
     { value: "bg-teal-500", label: "Teal" },
+    { value: "bg-white border border-gray-300", label: "White" },
   ];
-
-  // Helper function to get product ID (handles both _id and id)
-  const getProductId = (product: HarvestProduct) => {
-    return product._id || product.id || "";
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-            Harvest Calendar Admin
-          </h1>
-          <p className="text-gray-600">
-            Manage harvest seasons and product availability
-          </p>
-        </div>
-
         {savedMsg && (
           <div
             className={`px-4 py-3 rounded mb-6 ${
@@ -256,7 +257,6 @@ export default function HarvestCalendarTab() {
                 ) : (
                   <section className="py-8 px-4 bg-gradient-to-br from-green-50 to-blue-50 rounded-lg">
                     <div className="max-w-7xl mx-auto">
-                      {/* Header Section */}
                       <div className="text-center mb-12">
                         <span className="text-green-600 uppercase tracking-widest text-sm font-semibold mb-3 block">
                           Farming Schedule
@@ -266,14 +266,11 @@ export default function HarvestCalendarTab() {
                         </h2>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                           Track the optimal harvesting periods for our premium
-                          agricultural products. Freshness guaranteed through
-                          seasonal farming practices.
+                          agricultural products.
                         </p>
                       </div>
 
-                      {/* Calendar Container */}
                       <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-                        {/* Table Header */}
                         <div className="bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4">
                           <div className="flex items-center justify-between">
                             <h3 className="text-white text-xl font-semibold">
@@ -288,7 +285,6 @@ export default function HarvestCalendarTab() {
                           </div>
                         </div>
 
-                        {/* Calendar Table */}
                         <div className="overflow-x-auto">
                           <table className="w-full">
                             <thead>
@@ -315,12 +311,11 @@ export default function HarvestCalendarTab() {
                             </thead>
 
                             <tbody>
-                              {harvestData.map((product, rowIndex) => (
+                              {harvestData.map((product) => (
                                 <tr
-                                  key={getProductId(product)}
+                                  key={product._id}
                                   className="border-b border-gray-100 hover:bg-green-50/50 transition-colors duration-200"
                                 >
-                                  {/* Product Cell */}
                                   <td className="py-4 px-6">
                                     <div className="flex items-center space-x-3">
                                       <div
@@ -330,10 +325,23 @@ export default function HarvestCalendarTab() {
                                           <img
                                             src={product.image}
                                             alt={product.name}
-                                            className="w-6 h-6 object-contain"
+                                            className="w-8 h-8 object-contain"
+                                            onError={(e) => {
+                                              (
+                                                e.target as HTMLImageElement
+                                              ).style.display = "none";
+                                              const parent = (
+                                                e.target as HTMLImageElement
+                                              ).parentElement;
+                                              if (parent) {
+                                                parent.innerHTML = `<span class="text-white text-sm font-bold">${product.name.charAt(
+                                                  0
+                                                )}</span>`;
+                                              }
+                                            }}
                                           />
                                         ) : (
-                                          <span className="text-white text-xs font-bold">
+                                          <span className="text-white text-sm font-bold">
                                             {product.name.charAt(0)}
                                           </span>
                                         )}
@@ -350,12 +358,11 @@ export default function HarvestCalendarTab() {
                                     </div>
                                   </td>
 
-                                  {/* Month Cells */}
                                   {months.map((_, monthIndex) => {
                                     const isHarvestMonth =
                                       product.months.includes(monthIndex);
                                     const isPeakMonth =
-                                      product.months.includes(monthIndex) &&
+                                      isHarvestMonth &&
                                       (monthIndex === product.months[0] ||
                                         monthIndex ===
                                           product.months[
@@ -406,7 +413,6 @@ export default function HarvestCalendarTab() {
                           </table>
                         </div>
 
-                        {/* Table Footer */}
                         <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
                           <div className="flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
                             <div className="flex items-center space-x-4 text-sm text-gray-600">
@@ -436,7 +442,6 @@ export default function HarvestCalendarTab() {
           {/* Manage Products Tab */}
           <TabsContent value="manage">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Add New Product Form */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -447,7 +452,7 @@ export default function HarvestCalendarTab() {
                 <CardContent className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Product Name
+                      Product Name *
                     </label>
                     <Input
                       value={newProduct.name}
@@ -462,31 +467,15 @@ export default function HarvestCalendarTab() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Product Image
                     </label>
-
-                    {/* Image Preview */}
-                    {newProduct.image && (
-                      <div className="mb-3">
-                        <img
-                          src={newProduct.image}
-                          alt="Preview"
-                          className="w-20 h-20 object-cover rounded border"
-                        />
-                      </div>
-                    )}
-
-                    {/* File Selector */}
                     <input
+                      id="imageInput"
                       type="file"
                       accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const imageURL = URL.createObjectURL(file);
-                          setNewProduct({ ...newProduct, image: imageURL });
-                        }
-                      }}
-                      className="block w-full text-sm text-gray-700"
+                      className="block w-full text-sm text-gray-700 border border-gray-300 rounded-md p-2"
                     />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Supported formats: JPG, PNG, WebP
+                    </p>
                   </div>
 
                   <div>
@@ -518,7 +507,7 @@ export default function HarvestCalendarTab() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Harvest Months
+                      Harvest Months *
                     </label>
                     <div className="grid grid-cols-6 gap-2">
                       {months.map((month, index) => (
@@ -538,7 +527,9 @@ export default function HarvestCalendarTab() {
                     </div>
                     <div className="mt-2 text-sm text-gray-600">
                       Selected:{" "}
-                      {newProduct.months.map((m) => months[m].name).join(", ")}
+                      {newProduct.months
+                        .map((m) => months[m].name)
+                        .join(", ") || "None"}
                     </div>
                   </div>
 
@@ -563,7 +554,6 @@ export default function HarvestCalendarTab() {
                 </CardContent>
               </Card>
 
-              {/* Existing Products List */}
               <Card>
                 <CardHeader>
                   <CardTitle>Manage Products ({harvestData.length})</CardTitle>
@@ -573,11 +563,15 @@ export default function HarvestCalendarTab() {
                     <div className="flex justify-center items-center py-8">
                       <Loader2 className="w-6 h-6 animate-spin text-green-600" />
                     </div>
+                  ) : harvestData.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      No products added yet
+                    </div>
                   ) : (
                     <div className="space-y-4">
                       {harvestData.map((product) => (
                         <div
-                          key={getProductId(product)}
+                          key={product._id}
                           className="border rounded-lg p-4"
                         >
                           <div className="flex items-center justify-between mb-3">
@@ -589,7 +583,20 @@ export default function HarvestCalendarTab() {
                                   <img
                                     src={product.image}
                                     alt={product.name}
-                                    className="w-4 h-4 object-contain"
+                                    className="w-5 h-5 object-contain"
+                                    onError={(e) => {
+                                      (
+                                        e.target as HTMLImageElement
+                                      ).style.display = "none";
+                                      const parent = (
+                                        e.target as HTMLImageElement
+                                      ).parentElement;
+                                      if (parent) {
+                                        parent.innerHTML = `<span class="text-white text-xs font-bold">${product.name.charAt(
+                                          0
+                                        )}</span>`;
+                                      }
+                                    }}
                                   />
                                 ) : (
                                   <span className="text-white text-xs font-bold">
@@ -601,74 +608,178 @@ export default function HarvestCalendarTab() {
                                 {product.name}
                               </span>
                             </div>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() =>
-                                handleDeleteProduct(getProductId(product))
-                              }
-                            >
-                              <Trash2 size={16} />
-                            </Button>
+                            <div className="flex items-center gap-2">
+                              {editingProduct?._id === product._id ? (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setEditingProduct(null)}
+                                >
+                                  <X size={16} />
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setEditingProduct(product)}
+                                >
+                                  <Edit2 size={16} />
+                                </Button>
+                              )}
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteProduct(product._id)}
+                              >
+                                <Trash2 size={16} />
+                              </Button>
+                            </div>
                           </div>
 
-                          <div className="space-y-2">
-                            <div>
-                              <label className="text-sm text-gray-600">
-                                Image URL
-                              </label>
-                              <Input
-                                value={product.image}
-                                onChange={(e) =>
-                                  updateProductField(
-                                    getProductId(product),
-                                    "image",
-                                    e.target.value
-                                  )
-                                }
-                                className="text-sm"
-                              />
-                            </div>
+                          {editingProduct?._id === product._id ? (
+                            <div className="space-y-3">
+                              <div>
+                                <label className="text-sm text-gray-600">
+                                  Product Name *
+                                </label>
+                                <Input
+                                  value={editingProduct.name}
+                                  onChange={(e) =>
+                                    setEditingProduct(
+                                      editingProduct
+                                        ? {
+                                            ...editingProduct,
+                                            name: e.target.value,
+                                          }
+                                        : null
+                                    )
+                                  }
+                                  className="text-sm mt-1"
+                                />
+                              </div>
 
-                            <div>
-                              <label className="text-sm text-gray-600">
-                                Color
-                              </label>
-                              <select
-                                value={product.color}
-                                onChange={(e) =>
-                                  updateProductField(
-                                    getProductId(product),
-                                    "color",
-                                    e.target.value
-                                  )
+                              <div>
+                                <label className="text-sm text-gray-600">
+                                  Update Image
+                                </label>
+                                <input
+                                  id={`imageInput-${product._id}`}
+                                  type="file"
+                                  accept="image/*"
+                                  className="block w-full text-sm text-gray-700 border border-gray-300 rounded-md p-2 mt-1"
+                                />
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Leave empty to keep current image
+                                </p>
+                              </div>
+
+                              <div>
+                                <label className="text-sm text-gray-600">
+                                  Color
+                                </label>
+                                <select
+                                  value={editingProduct.color}
+                                  onChange={(e) =>
+                                    setEditingProduct(
+                                      editingProduct
+                                        ? {
+                                            ...editingProduct,
+                                            color: e.target.value,
+                                          }
+                                        : null
+                                    )
+                                  }
+                                  className="w-full p-2 border border-gray-300 rounded-md text-sm mt-1"
+                                >
+                                  {colorOptions.map((color) => (
+                                    <option
+                                      key={color.value}
+                                      value={color.value}
+                                    >
+                                      {color.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              <div>
+                                <label className="text-sm text-gray-600">
+                                  Harvest Months *
+                                </label>
+                                <div className="flex flex-wrap gap-1 mt-2">
+                                  {months.map((month, index) => (
+                                    <button
+                                      key={index}
+                                      type="button"
+                                      onClick={() =>
+                                        toggleMonth(index, product)
+                                      }
+                                      className={`px-2 py-1 text-xs rounded transition-colors ${
+                                        editingProduct.months.includes(index)
+                                          ? "bg-green-500 text-white"
+                                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                      }`}
+                                    >
+                                      {month.name}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <Button
+                                onClick={() =>
+                                  editingProduct &&
+                                  handleUpdateProduct(editingProduct)
                                 }
-                                className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                                disabled={
+                                  !editingProduct?.name ||
+                                  editingProduct.months.length === 0
+                                }
+                                className="w-full"
                               >
-                                {colorOptions.map((color) => (
-                                  <option key={color.value} value={color.value}>
-                                    {color.label}
-                                  </option>
-                                ))}
-                              </select>
+                                Update Product
+                              </Button>
                             </div>
-
-                            <div>
-                              <label className="text-sm text-gray-600">
-                                Harvest Months
-                              </label>
-                              <div className="flex flex-wrap gap-1 mt-1">
-                                {product.months.map((monthIndex) => (
-                                  <span
-                                    key={monthIndex}
-                                    className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded"
-                                  >
-                                    {months[monthIndex].name}
+                          ) : (
+                            <div className="space-y-2">
+                              <div>
+                                <span className="text-sm text-gray-600">
+                                  Image:
+                                </span>
+                                <p className="text-sm truncate">
+                                  {product.image || "No image"}
+                                </p>
+                              </div>
+                              <div>
+                                <span className="text-sm text-gray-600">
+                                  Color:
+                                </span>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <div
+                                    className={`w-4 h-4 rounded ${product.color}`}
+                                  ></div>
+                                  <span className="text-sm">
+                                    {product.color}
                                   </span>
-                                ))}
+                                </div>
+                              </div>
+                              <div>
+                                <span className="text-sm text-gray-600">
+                                  Harvest Months:
+                                </span>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {product.months.map((monthIndex) => (
+                                    <span
+                                      key={monthIndex}
+                                      className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded"
+                                    >
+                                      {months[monthIndex].name}
+                                    </span>
+                                  ))}
+                                </div>
                               </div>
                             </div>
-                          </div>
+                          )}
                         </div>
                       ))}
                     </div>

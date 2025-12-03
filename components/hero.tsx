@@ -1,4 +1,3 @@
-// components/Hero.tsx
 "use client";
 
 import {
@@ -46,7 +45,6 @@ export default function Hero() {
         setData(heroData);
       } catch (err) {
         console.error("Error fetching hero data:", err);
-        // Fallback to default data
         setData({
           liveLabel: "LIVE",
           typewriterText:
@@ -66,7 +64,6 @@ export default function Hero() {
     fetchHeroData();
   }, []);
 
-  // Show loading state
   if (isLoading) {
     return (
       <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-green-900 to-emerald-800">
@@ -82,7 +79,6 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden flex items-center justify-center">
-      {/* Background */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-fixed scale-105"
         style={{
@@ -106,23 +102,27 @@ export default function Hero() {
         ))}
       </div>
 
-      {/* Content */}
       <div className="relative z-10 w-full flex items-center justify-center px-4 sm:px-6 lg:px-8 py-20">
         <div className="text-center w-full max-w-4xl">
-          {/* LIVE + Typewriter */}
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 py-2 mb-6 animate-fadeInUp">
-            <div className="flex items-center gap-1 bg-green-600/20 px-2 py-1 rounded-lg border border-green-400/30">
+          <div
+            className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-3 py-1.5 mb-6 animate-fadeInUp 
+    max-w-full overflow-hidden"
+          >
+            <div className="flex items-center gap-1 bg-green-600/20 px-2 py-0.5 rounded-lg border border-green-400/30 shrink-0">
               <Sprout className="w-3 h-3 text-green-300" />
-              <span className="text-green-200 text-xs font-semibold">
+              <span className="text-green-200 text-[10px] sm:text-xs font-semibold whitespace-nowrap">
                 {data.liveLabel}
               </span>
             </div>
-            <span className="text-white text-sm font-medium loop-typewriter">
+
+            <span
+              className="text-white text-xs sm:text-sm md:text-base font-medium loop-typewriter 
+      truncate max-w-[150px] sm:max-w-[220px] md:max-w-none"
+            >
               {data.typewriterText}
             </span>
           </div>
 
-          {/* Heading */}
           <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             <span className="block animate-fadeInUp">{data.headingMain}</span>
             <span className="block bg-gradient-to-r from-green-300 via-green-400 to-green-500 bg-clip-text text-transparent mt-4 animate-gradientText">
@@ -130,7 +130,6 @@ export default function Hero() {
             </span>
           </h1>
 
-          {/* Description */}
           <p className="text-lg sm:text-xl md:text-2xl text-gray-200 mb-8 max-w-2xl mx-auto animate-fadeInUp animation-delay-300">
             {data.description}{" "}
             <span className="text-green-300 font-semibold">
@@ -138,7 +137,6 @@ export default function Hero() {
             </span>
           </p>
 
-          {/* CTA buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center animate-fadeInUp animation-delay-500">
             <Link href="#products" className="w-full sm:w-auto">
               <Button className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white text-base sm:text-lg py-6 sm:py-7 px-8 sm:px-12 rounded-2xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 font-semibold border-2 border-green-500/30 flex items-center justify-center gap-3 group">
@@ -159,7 +157,6 @@ export default function Hero() {
             </Link>
           </div>
 
-          {/* Stats & Features */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-12 animate-fadeInUp animation-delay-700">
             {[
               {
@@ -227,7 +224,6 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Bottom mobile bar */}
       <div className="fixed bottom-0 left-0 right-0 z-30 bg-black/90 backdrop-blur-md border-t border-green-500/20 sm:hidden">
         <div className="flex justify-around items-center p-3">
           {[
