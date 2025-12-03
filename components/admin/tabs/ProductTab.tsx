@@ -1,5 +1,4 @@
-// components/admin/tabs/ProductsTab.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,9 +16,13 @@ import {
   FileImage,
   Tag,
   Globe,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { ProductForm } from "@/types/product";
-import { updateProducts, deleteProduct } from "@/lib/db";
+import Image from "next/image";
 
 interface ProductsTabProps {
   products: any[];
@@ -52,18 +55,93 @@ export default function ProductsTab({
 
   const [uploading, setUploading] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
+  const [expandedProducts, setExpandedProducts] = useState<Set<string>>(
+    new Set()
+  );
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/api/products`);
+      if (res.ok) {
+        const data = await res.json();
+        setProducts(data);
+      }
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      setSavedMsg("❌ Failed to fetch products");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSaveProducts = async () => {
-    await updateProducts(products);
-    setSavedMsg("Products updated successfully!");
+    await fetchProducts();
+    setSavedMsg("Products refreshed successfully!");
     setTimeout(() => setSavedMsg(""), 3000);
   };
 
   const handleDeleteProduct = async (id: string) => {
-    await deleteProduct(id);
-    setProducts(products.filter((p) => p.id !== id));
-    setSavedMsg("Product deleted successfully!");
-    setTimeout(() => setSavedMsg(""), 3000);
+    if (!confirm("Are you sure you want to delete this product?")) return;
+
+    try {
+      const res = await fetch(`/api/products?id=${id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setProducts(products.filter((p) => p.id !== id));
+        setSavedMsg("Product deleted successfully!");
+        setTimeout(() => setSavedMsg(""), 3000);
+      } else {
+        throw new Error("Failed to delete product");
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      setSavedMsg("❌ Failed to delete product");
+    }
+  };
+
+  const handleUpdateProduct = async (product: any) => {
+    try {
+      const res = await fetch(`/api/products`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product),
+      });
+
+      if (res.ok) {
+        setProducts(
+          products.map((p) => (p.id === product.id ? { ...p, ...product } : p))
+        );
+        setEditingProductId(null);
+        setSavedMsg("Product updated successfully!");
+        setTimeout(() => setSavedMsg(""), 3000);
+      } else {
+        throw new Error("Failed to update product");
+      }
+    } catch (error) {
+      console.error("Error updating product:", error);
+      setSavedMsg("❌ Failed to update product");
+    }
+  };
+
+  const toggleProductExpansion = (productId: string) => {
+    const newExpanded = new Set(expandedProducts);
+    if (newExpanded.has(productId)) {
+      newExpanded.delete(productId);
+    } else {
+      newExpanded.add(productId);
+    }
+    setExpandedProducts(newExpanded);
   };
 
   const updateProductField = (
@@ -124,7 +202,7 @@ export default function ProductsTab({
           });
         }
 
-        const res = await fetch(`${process.env.APP_HOST}/api/products`, {
+        const res = await fetch(`/api/products`, {
           method: "POST",
           body: formData,
         });
@@ -167,14 +245,463 @@ export default function ProductsTab({
     }
   };
 
+  const renderProductCard = (product: any) => {
+    const isExpanded = expandedProducts.has(product.id);
+    const isEditing = editingProductId === product.id;
+
+    return (
+      <Card
+        key={product.id}
+        className="border-2 border-emerald-100 shadow-sm rounded-xl overflow-hidden mb-4"
+      >
+        <CardHeader className="bg-gradient-to-r from-emerald-50 to-green-50 border-b border-emerald-100 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-emerald-100 rounded-lg">
+                <Package className="w-5 h-5 text-emerald-700" />
+              </div>
+              <div>
+                <CardTitle className="text-lg font-semibold text-emerald-900">
+                  {isEditing ? (
+                    <Input
+                      value={product.name}
+                      onChange={(e) =>
+                        updateProductField(product.id, "name", e.target.value)
+                      }
+                      className="border-emerald-300"
+                    />
+                  ) : (
+                    product.name
+                  )}
+                </CardTitle>
+                <p className="text-sm text-emerald-600 mt-1">
+                  {isEditing ? (
+                    <Input
+                      value={product.subtitle || ""}
+                      onChange={(e) =>
+                        updateProductField(
+                          product.id,
+                          "subtitle",
+                          e.target.value
+                        )
+                      }
+                      className="border-emerald-300 text-sm mt-1"
+                    />
+                  ) : (
+                    product.subtitle
+                  )}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => toggleProductExpansion(product.id)}
+                className="text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+              >
+                {isExpanded ? (
+                  <>
+                    <EyeOff className="w-4 h-4 mr-1" />
+                    Hide
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-4 h-4 mr-1" />
+                    View
+                  </>
+                )}
+              </Button>
+              {isEditing ? (
+                <>
+                  <Button
+                    size="sm"
+                    onClick={() => handleUpdateProduct(product)}
+                    className="bg-emerald-600 hover:bg-emerald-700"
+                  >
+                    <Check className="w-4 h-4 mr-1" />
+                    Save
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditingProductId(null)}
+                    className="text-red-600 border-red-300 hover:bg-red-50"
+                  >
+                    <X className="w-4 h-4 mr-1" />
+                    Cancel
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setEditingProductId(product.id)}
+                    className="text-emerald-700 border-emerald-300 hover:bg-emerald-50"
+                  >
+                    <Edit className="w-4 h-4 mr-1" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDeleteProduct(product.id)}
+                    className="text-red-600 border-red-300 hover:bg-red-50"
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" />
+                    Delete
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+
+        {isExpanded && (
+          <CardContent className="p-6">
+            <div className="mb-6">
+              <h4 className="text-sm font-semibold text-emerald-800 mb-2">
+                Main Image
+              </h4>
+              {product.image ? (
+                <div className="relative w-full max-w-md h-48 rounded-lg overflow-hidden border border-emerald-200">
+                  <Image
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="w-full max-w-md h-48 border-2 border-dashed border-emerald-300 rounded-lg flex items-center justify-center bg-emerald-50">
+                  <ImageIcon className="w-12 h-12 text-emerald-400" />
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <label className="text-sm font-medium text-emerald-800">
+                  Botanical Name
+                </label>
+                {isEditing ? (
+                  <Input
+                    value={product.botanicalName || ""}
+                    onChange={(e) =>
+                      updateProductField(
+                        product.id,
+                        "botanicalName",
+                        e.target.value
+                      )
+                    }
+                    className="border-emerald-300 mt-1"
+                  />
+                ) : (
+                  <p className="text-gray-700 mt-1">{product.botanicalName}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-emerald-800">
+                  Form
+                </label>
+                {isEditing ? (
+                  <Input
+                    value={product.form || ""}
+                    onChange={(e) =>
+                      updateProductField(product.id, "form", e.target.value)
+                    }
+                    className="border-emerald-300 mt-1"
+                  />
+                ) : (
+                  <p className="text-gray-700 mt-1">{product.form}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-emerald-800">
+                  Packaging
+                </label>
+                {isEditing ? (
+                  <Input
+                    value={product.packaging || ""}
+                    onChange={(e) =>
+                      updateProductField(
+                        product.id,
+                        "packaging",
+                        e.target.value
+                      )
+                    }
+                    className="border-emerald-300 mt-1"
+                  />
+                ) : (
+                  <p className="text-gray-700 mt-1">{product.packaging}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-emerald-800">
+                  Origin
+                </label>
+                {isEditing ? (
+                  <Input
+                    value={product.origin || ""}
+                    onChange={(e) =>
+                      updateProductField(product.id, "origin", e.target.value)
+                    }
+                    className="border-emerald-300 mt-1"
+                  />
+                ) : (
+                  <p className="text-gray-700 mt-1">{product.origin}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h4 className="text-sm font-semibold text-emerald-800 mb-2">
+                SEO Information
+              </h4>
+              <div className="space-y-2">
+                <div>
+                  <label className="text-sm font-medium text-emerald-800">
+                    Meta Title
+                  </label>
+                  {isEditing ? (
+                    <Input
+                      value={product.metaTitle || ""}
+                      onChange={(e) =>
+                        updateProductField(
+                          product.id,
+                          "metaTitle",
+                          e.target.value
+                        )
+                      }
+                      className="border-emerald-300 mt-1"
+                    />
+                  ) : (
+                    <p className="text-gray-700 mt-1 text-sm">
+                      {product.metaTitle}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-emerald-800">
+                    Meta Description
+                  </label>
+                  {isEditing ? (
+                    <Textarea
+                      value={product.metaDescription || ""}
+                      onChange={(e) =>
+                        updateProductField(
+                          product.id,
+                          "metaDescription",
+                          e.target.value
+                        )
+                      }
+                      className="border-emerald-300 mt-1"
+                      rows={2}
+                    />
+                  ) : (
+                    <p className="text-gray-700 mt-1 text-sm">
+                      {product.metaDescription}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <h4 className="text-sm font-semibold text-emerald-800 mb-2">
+                Specifications
+              </h4>
+              {isEditing ? (
+                <Textarea
+                  value={Object.entries(product.specifications || {})
+                    .map(([key, val]) => `${key}: ${val}`)
+                    .join("\n")}
+                  onChange={(e) => {
+                    const text = e.target.value;
+                    const lines = text.split("\n");
+                    const obj: Record<string, string> = {};
+
+                    lines.forEach((line) => {
+                      const [key, ...rest] = line.split(":");
+                      const value = rest.join(":").trim();
+                      if (key?.trim()) {
+                        obj[key.trim()] = value;
+                      }
+                    });
+
+                    updateProductField(product.id, "specifications", obj);
+                  }}
+                  rows={4}
+                  className="border-emerald-300 font-mono text-sm"
+                />
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  {Object.entries(product.specifications || {}).map(
+                    ([key, value]) => (
+                      <div key={key} className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-emerald-800">
+                          {key}:
+                        </span>
+                        <span className="text-sm text-gray-700">
+                          {value as string}
+                        </span>
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-semibold text-emerald-800">
+                  Description
+                </label>
+                {isEditing ? (
+                  <Textarea
+                    value={product.description || ""}
+                    onChange={(e) =>
+                      updateProductField(
+                        product.id,
+                        "description",
+                        e.target.value
+                      )
+                    }
+                    className="border-emerald-300 mt-1"
+                    rows={3}
+                  />
+                ) : (
+                  <p className="text-gray-700 mt-1">{product.description}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-emerald-800">
+                  Benefits
+                </label>
+                {isEditing ? (
+                  <Textarea
+                    value={product.benefits || ""}
+                    onChange={(e) =>
+                      updateProductField(product.id, "benefits", e.target.value)
+                    }
+                    className="border-emerald-300 mt-1"
+                    rows={2}
+                  />
+                ) : (
+                  <p className="text-gray-700 mt-1">{product.benefits}</p>
+                )}
+              </div>
+
+              <div>
+                <label className="text-sm font-semibold text-emerald-800">
+                  Additional Details
+                </label>
+                {isEditing ? (
+                  <Textarea
+                    value={product.details || ""}
+                    onChange={(e) =>
+                      updateProductField(product.id, "details", e.target.value)
+                    }
+                    className="border-emerald-300 mt-1"
+                    rows={2}
+                  />
+                ) : (
+                  <p className="text-gray-700 mt-1">{product.details}</p>
+                )}
+              </div>
+            </div>
+
+            {product.gallery && product.gallery.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-sm font-semibold text-emerald-800 mb-2">
+                  Gallery Images
+                </h4>
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {product.gallery.map((img: string, index: number) => (
+                    <div
+                      key={index}
+                      className="relative w-24 h-24 rounded-lg overflow-hidden border border-emerald-200 flex-shrink-0"
+                    >
+                      <Image
+                        src={img}
+                        alt={`${product.name} gallery ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        )}
+      </Card>
+    );
+  };
+
   return (
     <div className="space-y-6 p-1">
-      {/* Add New Product Form */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-emerald-900">
+            Product Management
+          </h2>
+          <p className="text-emerald-600">
+            Add, edit, and manage your agricultural products
+          </p>
+        </div>
+        <Button
+          onClick={handleSaveProducts}
+          className="bg-emerald-600 hover:bg-emerald-700"
+        >
+          Refresh Products
+        </Button>
+      </div>
+
+      <Card className="border-2 border-emerald-100 shadow-lg rounded-2xl overflow-hidden">
+        <CardHeader className="bg-gradient-to-r from-emerald-50 to-green-50 border-b border-emerald-100">
+          <CardTitle className="flex items-center gap-3 text-emerald-900 text-xl font-bold">
+            <div className="p-2 bg-emerald-100 rounded-lg">
+              <Package className="w-5 h-5 text-emerald-700" />
+            </div>
+            <div>
+              All Products ({products.length})
+              <p className="text-sm font-normal text-emerald-600 mt-1">
+                View and manage all products in your catalog
+              </p>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          {loading ? (
+            <div className="text-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 mx-auto"></div>
+              <p className="text-emerald-600 mt-2">Loading products...</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div className="text-center py-8">
+              <Package className="w-12 h-12 text-emerald-400 mx-auto mb-3" />
+              <p className="text-emerald-600">No products found</p>
+              <p className="text-sm text-emerald-500 mt-1">
+                Add your first product using the form below
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">{products.map(renderProductCard)}</div>
+          )}
+        </CardContent>
+      </Card>
+
       <Card className="border-2 border-emerald-100 shadow-lg rounded-2xl overflow-hidden bg-gradient-to-b from-white to-emerald-50/30">
         <CardHeader className="bg-gradient-to-r from-emerald-50 to-green-50 border-b border-emerald-100">
           <CardTitle className="flex items-center gap-3 text-emerald-900 text-2xl font-bold">
             <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl shadow-sm">
-              <Package className="w-6 h-6 text-white" />
+              <Plus className="w-6 h-6 text-white" />
             </div>
             <div>
               Add New Product
@@ -186,7 +713,6 @@ export default function ProductsTab({
         </CardHeader>
 
         <CardContent className="space-y-8 pt-6">
-          {/* Product Info Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2.5 mb-4">
               <div className="p-1.5 bg-emerald-100 rounded-lg">
@@ -296,7 +822,6 @@ export default function ProductsTab({
             </div>
           </div>
 
-          {/* SEO Meta Fields */}
           <div className="space-y-4">
             <div className="flex items-center gap-2.5 mb-4">
               <div className="p-1.5 bg-emerald-100 rounded-lg">
@@ -345,7 +870,6 @@ export default function ProductsTab({
             </div>
           </div>
 
-          {/* Image Upload Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2.5 mb-4">
               <div className="p-1.5 bg-emerald-100 rounded-lg">
@@ -409,7 +933,6 @@ export default function ProductsTab({
             </div>
           </div>
 
-          {/* Specifications */}
           <div className="space-y-4">
             <div className="flex items-center gap-2.5 mb-4">
               <div className="p-1.5 bg-emerald-100 rounded-lg">
@@ -461,7 +984,6 @@ Ash Content: 5% max"
             </div>
           </div>
 
-          {/* Description Section */}
           <div className="space-y-6">
             <div className="flex items-center gap-2.5 mb-4">
               <div className="p-1.5 bg-emerald-100 rounded-lg">
@@ -529,7 +1051,6 @@ Ash Content: 5% max"
             </div>
           </div>
 
-          {/* Add Button */}
           <div className="pt-4">
             <Button
               onClick={handleAddProduct}

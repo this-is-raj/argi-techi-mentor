@@ -19,7 +19,27 @@ import {
   Send,
   Shield,
   AlertCircle,
+  Globe,
+  Tag,
+  Info,
+  RefreshCw,
 } from "lucide-react";
+
+interface Product {
+  id: string;
+  name: string;
+  subtitle?: string;
+  image: string;
+  botanicalName?: string;
+  form?: string;
+  packaging?: string;
+  origin?: string;
+  gallery?: string[];
+  specifications?: Record<string, string>;
+  description?: string;
+  benefits?: string;
+  details?: string;
+}
 
 interface Enquiry {
   _id: string;
@@ -30,23 +50,16 @@ interface Enquiry {
   country: string;
   enquiry: string;
   selectedProducts?: string[];
+  productDetails?: Product[];
   createdAt: string;
+  updatedAt?: string;
   status: "new" | "contacted" | "resolved";
   read: boolean;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  image: string;
-  botanicalName?: string;
-  form?: string;
-  packaging?: string;
+  source?: string;
 }
 
 export default function EnquiriesTab() {
   const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedEnquiry, setSelectedEnquiry] = useState<Enquiry | null>(null);
@@ -61,44 +74,88 @@ export default function EnquiriesTab() {
   useEffect(() => {
     setMounted(true);
     fetchEnquiries();
-    fetchProducts();
   }, []);
 
   const fetchEnquiries = async () => {
     try {
-      const res = await fetch("/api/enquiry");
-      if (!res.ok) throw new Error("Failed to fetch");
+      setLoading(true);
+      const res = await fetch(`/api/enquiry`, {
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache",
+        },
+      });
+
+      console.log("Fetching enquiries...");
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("/api Error:", errorText);
+        throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+      }
+
       const data = await res.json();
 
-      const normalizedData = data.map((enquiry: Enquiry) => ({
+      console.log("DEBUG: Received data:", {
+        count: data.length,
+        firstEnquiry: data[0],
+        firstProductDetails: data[0]?.productDetails,
+      });
+
+      const normalizedData = data.map((enquiry: any) => ({
         ...enquiry,
         selectedProducts: enquiry.selectedProducts || [],
+        productDetails: (enquiry.productDetails || []).map((product: any) => {
+          console.log("Product data:", product);
+          return {
+            id: product.id || product._id || "",
+            name: product.name || "Unknown Product",
+            subtitle: product.subtitle || "",
+            image: product.image || "/images/placeholder-product.jpg",
+            botanicalName: product.botanicalName || "",
+            form: product.form || "",
+            packaging: product.packaging || "",
+            origin: product.origin || "",
+            gallery: product.gallery || [],
+            specifications: product.specifications || {},
+            description: product.description || "",
+            benefits: product.benefits || "",
+            details: product.details || "",
+          };
+        }),
+        createdAt: enquiry.createdAt || new Date().toISOString(),
+        updatedAt:
+          enquiry.updatedAt || enquiry.createdAt || new Date().toISOString(),
+        status: enquiry.status || "new",
+        read: enquiry.read || false,
+        city: enquiry.city || "",
+        country: enquiry.country || "",
+        phone: enquiry.phone || "",
+        source: enquiry.source || "website",
       }));
 
+      console.log("Normalized data:", normalizedData);
       setEnquiries(normalizedData);
+      setError("");
     } catch (err) {
-      setError("Failed to load enquiries");
+      console.error("Error fetching enquiries:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to load enquiries. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch("/api/products");
-      if (res.ok) {
-        const productsData = await res.json();
-        setProducts(productsData);
-      }
-    } catch (error) {
-      console.error("Failed to fetch products:", error);
-    }
-  };
-
   const openEnquiryDetails = (enquiry: Enquiry) => {
+    console.log("Opening enquiry:", enquiry);
+    console.log("Product details:", enquiry.productDetails);
     setSelectedEnquiry({
       ...enquiry,
       selectedProducts: enquiry.selectedProducts || [],
+      productDetails: enquiry.productDetails || [],
     });
     setIsModalOpen(true);
     if (!enquiry.read) {
@@ -140,10 +197,6 @@ export default function EnquiriesTab() {
     }
   };
 
-  const getProductById = (productId: string): Product | undefined => {
-    return products.find((product) => product.id === productId);
-  };
-
   const filteredEnquiries = enquiries
     .filter((enquiry) => filter === "all" || enquiry.status === filter)
     .filter((enquiry) => {
@@ -154,7 +207,13 @@ export default function EnquiriesTab() {
         enquiry.email.toLowerCase().includes(query) ||
         enquiry.city?.toLowerCase().includes(query) ||
         enquiry.country?.toLowerCase().includes(query) ||
-        enquiry.enquiry.toLowerCase().includes(query)
+        enquiry.enquiry.toLowerCase().includes(query) ||
+        enquiry.productDetails?.some(
+          (product) =>
+            product.name.toLowerCase().includes(query) ||
+            product.botanicalName?.toLowerCase().includes(query) ||
+            product.subtitle?.toLowerCase().includes(query)
+        )
       );
     });
 
@@ -192,10 +251,6 @@ export default function EnquiriesTab() {
     return enquiries.filter((enquiry) => !enquiry.read).length;
   };
 
-  const getSelectedProducts = (enquiry: Enquiry): string[] => {
-    return enquiry.selectedProducts || [];
-  };
-
   const exportEnquiries = () => {
     const data = JSON.stringify(filteredEnquiries, null, 2);
     const blob = new Blob([data], { type: "application/json" });
@@ -210,7 +265,24 @@ export default function EnquiriesTab() {
   };
 
   const sendReply = (email: string) => {
-    window.open(`mailto:${email}`, "_blank");
+    window.open(
+      `mailto:${email}?subject=Regarding Your Product Enquiry`,
+      "_blank"
+    );
+  };
+
+  const formatDate = (dateString: string) => {
+    try {
+      return new Date(dateString).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return "Invalid Date";
+    }
   };
 
   if (!mounted) {
@@ -223,7 +295,6 @@ export default function EnquiriesTab() {
 
   return (
     <div className="w-full space-y-6">
-      {/* Header */}
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-emerald-900">
@@ -236,6 +307,13 @@ export default function EnquiriesTab() {
 
         <div className="flex flex-wrap items-center gap-3">
           <button
+            onClick={fetchEnquiries}
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-emerald-700 rounded-xl hover:bg-emerald-50 transition-colors border border-emerald-200"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span className="hidden sm:inline">Refresh</span>
+          </button>
+          <button
             onClick={exportEnquiries}
             className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-700 rounded-xl hover:bg-emerald-100 transition-colors border border-emerald-200"
           >
@@ -245,7 +323,6 @@ export default function EnquiriesTab() {
         </div>
       </div>
 
-      {/* Search and Filter Bar */}
       <div className="bg-white rounded-2xl border border-emerald-100 p-4 shadow-sm">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-1">
@@ -253,7 +330,7 @@ export default function EnquiriesTab() {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-emerald-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search enquiries by name, email, or message..."
+                placeholder="Search by name, email, product, or message..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 bg-emerald-50/50 border border-emerald-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-400 transition-all"
@@ -277,7 +354,6 @@ export default function EnquiriesTab() {
           </div>
         </div>
 
-        {/* Filter Options */}
         {showFilters && (
           <div className="mt-4 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100">
             <div className="flex flex-wrap gap-2">
@@ -329,7 +405,6 @@ export default function EnquiriesTab() {
         )}
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-white to-emerald-50 rounded-2xl p-6 shadow-sm border border-emerald-100">
           <div className="flex items-center justify-between">
@@ -390,7 +465,6 @@ export default function EnquiriesTab() {
         </div>
       </div>
 
-      {/* Loading State */}
       {loading && (
         <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-emerald-100">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto"></div>
@@ -400,7 +474,6 @@ export default function EnquiriesTab() {
         </div>
       )}
 
-      {/* Error State */}
       {error && (
         <div className="bg-gradient-to-r from-red-50 to-orange-50 border border-red-200 rounded-2xl p-8 text-center">
           <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
@@ -414,7 +487,6 @@ export default function EnquiriesTab() {
         </div>
       )}
 
-      {/* Empty State */}
       {!loading && !error && filteredEnquiries.length === 0 && (
         <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-emerald-100">
           <div className="text-emerald-400 text-6xl mb-4">📭</div>
@@ -429,7 +501,6 @@ export default function EnquiriesTab() {
         </div>
       )}
 
-      {/* Enquiries List */}
       {!loading && filteredEnquiries.length > 0 && (
         <div className="bg-white rounded-2xl shadow-sm border border-emerald-100 overflow-hidden">
           <div className="overflow-x-auto">
@@ -458,13 +529,15 @@ export default function EnquiriesTab() {
               </thead>
               <tbody className="divide-y divide-emerald-50">
                 {filteredEnquiries.map((item) => {
-                  const selectedProducts = getSelectedProducts(item);
+                  const productDetails = item.productDetails || [];
+
                   return (
                     <tr
                       key={item._id}
                       className={`hover:bg-emerald-50/50 cursor-pointer transition-all ${
                         !item.read ? "bg-amber-50/50" : ""
                       }`}
+                      onClick={() => openEnquiryDetails(item)}
                     >
                       <td className="p-4">
                         <div className="flex items-center gap-3">
@@ -484,7 +557,7 @@ export default function EnquiriesTab() {
                             </span>
                           </div>
                           <div>
-                            <div className="font-medium text-emerald-900 group-hover:text-emerald-600 transition-colors">
+                            <div className="font-medium text-emerald-900">
                               {item.name}
                               {!item.read && (
                                 <span className="ml-2 inline-flex h-2 w-2 bg-amber-500 rounded-full animate-pulse"></span>
@@ -521,38 +594,28 @@ export default function EnquiriesTab() {
                         <div className="flex items-center gap-2 text-emerald-700">
                           <Calendar className="w-3.5 h-3.5" />
                           <div className="text-sm">
-                            {item.createdAt
-                              ? new Date(item.createdAt).toLocaleDateString(
-                                  "en-IN",
-                                  {
-                                    day: "numeric",
-                                    month: "short",
-                                    year: "numeric",
-                                  }
-                                )
-                              : "-"}
+                            {formatDate(item.createdAt)}
                           </div>
                         </div>
                       </td>
                       <td className="p-4">
                         <div className="flex flex-wrap gap-1">
-                          {selectedProducts.length > 0 ? (
+                          {productDetails.length > 0 ? (
                             <>
-                              {selectedProducts.slice(0, 1).map((productId) => {
-                                const product = getProductById(productId);
-                                return (
-                                  <span
-                                    key={productId}
-                                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs bg-emerald-100 text-emerald-800 border border-emerald-200"
-                                  >
-                                    <Package className="w-3 h-3" />
-                                    {product?.name || "Product"}
+                              {productDetails.slice(0, 2).map((product) => (
+                                <div
+                                  key={product.id}
+                                  className="flex items-center gap-1 px-2 py-1 rounded-lg text-xs bg-emerald-50 text-emerald-800 border border-emerald-200"
+                                >
+                                  <Package className="w-3 h-3" />
+                                  <span className="max-w-[80px] truncate">
+                                    {product.name}
                                   </span>
-                                );
-                              })}
-                              {selectedProducts.length > 1 && (
+                                </div>
+                              ))}
+                              {productDetails.length > 2 && (
                                 <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs bg-emerald-50 text-emerald-600 border border-emerald-100">
-                                  +{selectedProducts.length - 1} more
+                                  +{productDetails.length - 2} more
                                 </span>
                               )}
                             </>
@@ -573,7 +636,7 @@ export default function EnquiriesTab() {
                           </span>
                         </div>
                       </td>
-                      <td className="p-4">
+                      <td className="p-4" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => openEnquiryDetails(item)}
@@ -598,11 +661,9 @@ export default function EnquiriesTab() {
         </div>
       )}
 
-      {/* Enquiry Detail Modal */}
       {isModalOpen && selectedEnquiry && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            {/* Modal Header */}
+          <div className="bg-white rounded-2xl shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden">
             <div className="bg-gradient-to-r from-emerald-600 to-green-600 p-6 text-white">
               <div className="flex justify-between items-start">
                 <div className="flex items-center gap-3">
@@ -625,9 +686,7 @@ export default function EnquiriesTab() {
               </div>
             </div>
 
-            {/* Modal Content */}
             <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(90vh-200px)]">
-              {/* Customer Info */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <h3 className="text-lg font-semibold text-emerald-900 flex items-center gap-2">
@@ -694,14 +753,7 @@ export default function EnquiriesTab() {
                           Date Submitted
                         </div>
                         <div className="text-emerald-900 font-medium">
-                          {selectedEnquiry.createdAt
-                            ? new Date(
-                                selectedEnquiry.createdAt
-                              ).toLocaleString("en-IN", {
-                                dateStyle: "medium",
-                                timeStyle: "short",
-                              })
-                            : "-"}
+                          {formatDate(selectedEnquiry.createdAt)}
                         </div>
                       </div>
                     </div>
@@ -738,66 +790,92 @@ export default function EnquiriesTab() {
                 </div>
               </div>
 
-              {/* Products Section */}
-              {selectedEnquiry.selectedProducts &&
-                selectedEnquiry.selectedProducts.length > 0 && (
+              {selectedEnquiry.productDetails &&
+                selectedEnquiry.productDetails.length > 0 && (
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-emerald-900 flex items-center gap-2">
                       <Package className="w-5 h-5" />
                       Interested Products (
-                      {selectedEnquiry.selectedProducts.length})
+                      {selectedEnquiry.productDetails.length})
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {selectedEnquiry.selectedProducts.map((productId) => {
-                        const product = getProductById(productId);
-                        return (
-                          <div
-                            key={productId}
-                            className="flex items-center gap-4 p-4 bg-emerald-50/50 rounded-xl border border-emerald-100 hover:border-emerald-200 transition-all"
-                          >
-                            <div className="flex-shrink-0 w-20 h-20 relative">
-                              <Image
-                                src={
-                                  product?.image || "/placeholder-product.jpg"
-                                }
-                                alt={product?.name || "Product"}
-                                width={80}
-                                height={80}
-                                className="rounded-lg object-cover border-2 border-white shadow-sm"
-                              />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="font-semibold text-emerald-900 truncate">
-                                {product?.name || "Unknown Product"}
-                              </div>
-                              {product?.botanicalName && (
-                                <div className="text-sm text-emerald-600 truncate">
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {selectedEnquiry.productDetails.map((product) => (
+                        <div
+                          key={product.id}
+                          className="border border-emerald-200 rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all"
+                        >
+                          <div className="relative w-full h-48 bg-emerald-50">
+                            <Image
+                              src={
+                                product.image ||
+                                "/images/placeholder-product.jpg"
+                              }
+                              alt={product.name}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                              priority
+                            />
+                          </div>
+
+                          <div className="p-4">
+                            <h4 className="font-bold text-lg text-emerald-900 mb-1">
+                              {product.name}
+                            </h4>
+
+                            {product.subtitle && (
+                              <p className="text-emerald-600 text-sm mb-2">
+                                {product.subtitle}
+                              </p>
+                            )}
+
+                            {product.botanicalName && (
+                              <div className="flex items-center gap-1 text-sm text-emerald-700 mb-2">
+                                <Tag className="w-3 h-3" />
+                                <span className="italic">
                                   {product.botanicalName}
+                                </span>
+                              </div>
+                            )}
+
+                            <div className="space-y-2 text-sm">
+                              {product.form && (
+                                <div className="flex items-center gap-1">
+                                  <Info className="w-3.5 h-3.5 text-emerald-500" />
+                                  <span className="text-emerald-700">
+                                    Form: {product.form}
+                                  </span>
                                 </div>
                               )}
-                              <div className="flex items-center gap-2 mt-2">
-                                {product?.form && (
-                                  <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded">
-                                    {product.form}
+
+                              {product.packaging && (
+                                <div className="flex items-center gap-1">
+                                  <Package className="w-3.5 h-3.5 text-amber-500" />
+                                  <span className="text-amber-700">
+                                    Packaging: {product.packaging}
                                   </span>
-                                )}
-                                {product?.packaging && (
-                                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded">
-                                    {product.packaging}
+                                </div>
+                              )}
+
+                              {product.origin && (
+                                <div className="flex items-center gap-1">
+                                  <Globe className="w-3.5 h-3.5 text-blue-500" />
+                                  <span className="text-blue-700">
+                                    Origin: {product.origin}
                                   </span>
-                                )}
-                              </div>
+                                </div>
+                              )}
                             </div>
                           </div>
-                        );
-                      })}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
 
-              {/* No Products Selected */}
-              {(!selectedEnquiry.selectedProducts ||
-                selectedEnquiry.selectedProducts.length === 0) && (
+              {(!selectedEnquiry.productDetails ||
+                selectedEnquiry.productDetails.length === 0) && (
                 <div className="text-center py-8 bg-gradient-to-r from-emerald-50 to-green-50 rounded-xl border border-emerald-200">
                   <Package className="w-12 h-12 text-emerald-300 mx-auto mb-3" />
                   <div className="text-emerald-700 font-medium">
@@ -809,7 +887,6 @@ export default function EnquiriesTab() {
                 </div>
               )}
 
-              {/* Enquiry Message */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-emerald-900 flex items-center gap-2">
                   <MessageSquare className="w-5 h-5" />
@@ -823,13 +900,12 @@ export default function EnquiriesTab() {
               </div>
             </div>
 
-            {/* Modal Footer */}
             <div className="border-t border-emerald-100 p-6 bg-emerald-50/30">
               <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div className="text-sm text-emerald-600">
                   Enquiry ID:{" "}
                   <span className="font-mono text-emerald-700">
-                    {selectedEnquiry._id}
+                    {selectedEnquiry._id.substring(0, 8)}...
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-3">

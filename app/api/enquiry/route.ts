@@ -1,17 +1,97 @@
 import { connectToDatabase } from "@/lib/mongodb";
 import { NextRequest, NextResponse } from "next/server";
-import { ObjectId } from "mongodb"; // <-- ADD THIS
+import { ObjectId } from "mongodb";
+
 export async function GET() {
   try {
     const { db } = await connectToDatabase();
 
     const enquiries = await db
       .collection("enquiries")
-      .find()
-      .sort({ createdAt: -1 })
+      .aggregate([
+        { $sort: { createdAt: -1 } },
+
+        {
+          $addFields: {
+            selectedProducts: {
+              $map: {
+                input: "$selectedProducts",
+                as: "p",
+                in: { $toObjectId: "$$p" },
+              },
+            },
+          },
+        },
+
+        {
+          $lookup: {
+            from: "products",
+            localField: "selectedProducts",
+            foreignField: "_id",
+            as: "productDetails",
+          },
+        },
+      ])
       .toArray();
 
-    return NextResponse.json(enquiries);
+    console.log("DEBUG: Found", enquiries.length, "enquiries");
+
+    enquiries.forEach((enquiry, index) => {
+      console.log(`Enquiry ${index + 1}:`, {
+        enquiryId: enquiry._id,
+        customer: enquiry.name,
+        productCount: enquiry.productDetails?.length || 0,
+        productDetails: enquiry.productDetails?.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          image: p.image,
+          hasImage: !!p.image,
+        })),
+      });
+    });
+
+    const formattedEnquiries = enquiries.map((enquiry) => ({
+      _id: enquiry._id.toString(),
+      name: enquiry.name || "",
+      email: enquiry.email || "",
+      phone: enquiry.phone || "",
+      city: enquiry.city || "",
+      country: enquiry.country || "",
+      enquiry: enquiry.enquiry || "",
+      selectedProducts: (enquiry.selectedProducts || [])
+        .map((id: ObjectId) => id?.toString() || "")
+        .filter(Boolean),
+      productDetails: (enquiry.productDetails || []).map((product: any) => {
+        console.log("Processing product:", product);
+
+        return {
+          id: product?.id || product?._id?.toString() || "",
+          name: product?.name || "Unknown Product",
+          subtitle: product?.subtitle || "",
+          image: product?.image || "/images/placeholder-product.jpg",
+          botanicalName: product?.botanicalName || "",
+          form: product?.form || "",
+          packaging: product?.packaging || "",
+          origin: product?.origin || "",
+          gallery: product?.gallery || [],
+          specifications: product?.specifications || {},
+          description: product?.description || "",
+          benefits: product?.benefits || "",
+          details: product?.details || "",
+          price: product?.price || "",
+          minQuantity: product?.minQuantity || "",
+          shelfLife: product?.shelfLife || "",
+        };
+      }),
+      createdAt: enquiry.createdAt || new Date().toISOString(),
+      updatedAt:
+        enquiry.updatedAt || enquiry.createdAt || new Date().toISOString(),
+      status: enquiry.status || "new",
+      read: enquiry.read || false,
+      source: enquiry.source || "website",
+    }));
+
+    return NextResponse.json(formattedEnquiries);
   } catch (error) {
     console.error("Error fetching enquiries:", error);
     return NextResponse.json(
@@ -26,14 +106,33 @@ export async function POST(request: NextRequest) {
     const { db } = await connectToDatabase();
     const body = await request.json();
 
-    const { name, email, phone, city, country, enquiry, selectedProducts } =
-      body;
+    console.log("Received enquiry data:", body);
+
+    const { name, email, phone, city, country, enquiry, productIds } = body;
 
     if (!name || !email || !enquiry) {
       return NextResponse.json(
         { error: "Name, email and enquiry are required" },
         { status: 400 }
       );
+    }
+
+    const productsIds: ObjectId[] = [];
+
+    if (Array.isArray(productIds)) {
+      for (const productId of productIds) {
+        try {
+          if (
+            productId &&
+            productId.trim() !== "" &&
+            ObjectId.isValid(productId)
+          ) {
+            productsIds.push(new ObjectId(productId));
+          }
+        } catch (error) {
+          console.error("Error converting product ID:", productId, error);
+        }
+      }
     }
 
     const enquiryData = {
@@ -43,15 +142,54 @@ export async function POST(request: NextRequest) {
       city: city || "",
       country: country || "",
       enquiry,
-      selectedProducts: selectedProducts || [],
+      selectedProducts: productsIds,
       createdAt: new Date(),
+      updatedAt: new Date(),
       status: "new",
       read: false,
+      source: "website",
     };
+    console.log("Inserting enquiry data:", enquiryData);
+    const result = await db.collection("enquiries").insertOne(enquiryData);
 
-    await db.collection("enquiries").insertOne(enquiryData);
+    const createdEnquiry = await db
+      .collection("enquiries")
+      .aggregate([
+        { $match: { _id: result.insertedId } },
+        {
+          $lookup: {
+            from: "products",
+            localField: "selectedProducts",
+            foreignField: "_id",
+            as: "productDetails",
+          },
+        },
+      ])
+      .next();
 
-    return NextResponse.json({ success: true, message: "Enquiry submitted" });
+    return NextResponse.json({
+      success: true,
+      message: "Enquiry submitted successfully",
+      id: result.insertedId.toString(),
+      enquiry: createdEnquiry
+        ? {
+            ...createdEnquiry,
+            _id: createdEnquiry._id.toString(),
+            selectedProducts: (createdEnquiry.selectedProducts || []).map(
+              (id: ObjectId) => id.toString()
+            ),
+            productDetails: (createdEnquiry.productDetails || []).map(
+              (product: any) => ({
+                id: product._id.toString(),
+                name: product.name || "Unknown",
+                image: product.image || "",
+                subtitle: product.subtitle || "",
+                botanicalName: product.botanicalName || "",
+              })
+            ),
+          }
+        : null,
+    });
   } catch (error) {
     console.error("Error submitting enquiry:", error);
     return NextResponse.json(
@@ -75,11 +213,24 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    await db
+    body.updatedAt = new Date();
+
+    const result = await db
       .collection("enquiries")
       .updateOne({ _id: new ObjectId(id) }, { $set: body });
 
-    return NextResponse.json({ success: true });
+    if (result.modifiedCount > 0) {
+      return NextResponse.json({
+        success: true,
+        updated: true,
+      });
+    }
+
+    return NextResponse.json({
+      success: false,
+      updated: false,
+      message: "Enquiry not found or not modified",
+    });
   } catch (error) {
     console.error("Error updating enquiry:", error);
     return NextResponse.json(

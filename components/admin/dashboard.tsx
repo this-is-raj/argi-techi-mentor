@@ -20,6 +20,9 @@ import {
   Shield,
   Leaf,
   Sprout,
+  File,
+  Layers,
+  Award,
 } from "lucide-react";
 
 const ProductsTab = dynamic(() => import("./tabs/ProductTab"), { ssr: false });
@@ -28,6 +31,11 @@ const CalendarTab = dynamic(() => import("./tabs/HarvestCalendarTab"), {
 });
 const EnquiriesTab = dynamic(() => import("./tabs/Enquiries"), { ssr: false });
 const HeroTab = dynamic(() => import("./tabs/HeroTab"), { ssr: false });
+const AboutTab = dynamic(() => import("./tabs/AboutTab"), { ssr: false });
+const ProductsSectionTab = dynamic(() => import("./tabs/ProductsSectionTab"), {
+  ssr: false,
+});
+const AwardsTab = dynamic(() => import("./tabs/Awards"), { ssr: false });
 
 interface AdminDashboardProps {
   onLogout: () => void;
@@ -36,18 +44,36 @@ interface AdminDashboardProps {
 const TABS = [
   { id: "products", label: "Products", icon: <Package className="w-5 h-5" /> },
   {
+    id: "hero",
+    label: "Homepage Hero",
+    icon: <ImageIcon className="w-5 h-5" />,
+  },
+  {
+    id: "products-section",
+    label: "Product Showcase",
+    icon: <Layers className="w-5 h-5" />,
+  },
+
+  {
+    id: "awards",
+    label: "Awards & Recognitions",
+    icon: <Award className="w-5 h-5" />,
+  },
+
+  {
     id: "calendar",
     label: "Harvest Calendar",
     icon: <Calendar className="w-5 h-5" />,
   },
   {
-    id: "hero",
-    label: "Hero Section",
-    icon: <ImageIcon className="w-5 h-5" />,
+    id: "about",
+    label: "About Us",
+    icon: <File className="w-5 h-5" />,
   },
+
   {
     id: "enquiries",
-    label: "Enquiries",
+    label: "Customer Enquiries",
     icon: <MessageSquare className="w-5 h-5" />,
   },
 ];
@@ -56,14 +82,26 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   const [active, setActive] = useState<string>("products");
   const [products, setProducts] = useState<any[]>([]);
   const [heroData, setHeroData] = useState<any>(null);
+  const [sectionData, setSectionData] = useState<any>(null);
   const [savedMsg, setSavedMsg] = useState<string>("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   useEffect(() => {
-    fetch("/api/hero")
+    fetch(`/api/hero`)
       .then((res) => res.json())
       .then((data) => setHeroData(data))
+      .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    fetch(`/api/section-content`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.productsSection) {
+          setSectionData(data.productsSection);
+        }
+      })
       .catch(console.error);
   }, []);
 
@@ -281,8 +319,18 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                   setHeroData={setHeroData}
                   setSavedMsg={setSavedMsg}
                 />
+              ) : active === "products-section" ? (
+                <ProductsSectionTab
+                  sectionData={sectionData}
+                  setSectionData={setSectionData}
+                  setSavedMsg={setSavedMsg}
+                />
               ) : active === "enquiries" ? (
                 <EnquiriesTab />
+              ) : active === "about" ? (
+                <AboutTab />
+              ) : active === "awards" ? (
+                <AwardsTab />
               ) : null}
             </div>
           </div>

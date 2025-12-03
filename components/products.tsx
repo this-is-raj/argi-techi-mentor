@@ -2,11 +2,38 @@ import Link from "next/link";
 import { Product } from "@/types/product";
 import { ArrowRight } from "lucide-react";
 
-export default async function Products() {
-  const response = await fetch(`${process.env.APP_HOST}/api/products`);
+async function getSectionContent() {
+  try {
+    const response = await fetch(
+      `${process.env.APP_HOST}/api/section-content`,
+      {
+        cache: "no-store",
+      }
+    );
 
-  const products = response.ok
-    ? (((await response.json()) || []) as Product[])
+    if (!response.ok) {
+      throw new Error("Failed to fetch section content");
+    }
+
+    const data = await response.json();
+    return data.productsSection;
+  } catch (error) {
+    return {
+      title: "BY CATEGORIES",
+      description:
+        "We bring you the finest selection over the years with a huge customer base worldwide. We offer a wide range of products without compromising on quality. We ensure the goodwill and trust of our global clients are highly prioritized.",
+    };
+  }
+}
+
+export default async function Products() {
+  const [productsResponse, sectionContent] = await Promise.all([
+    fetch(`${process.env.APP_HOST}/api/products`),
+    getSectionContent(),
+  ]);
+
+  const products = productsResponse.ok
+    ? (((await productsResponse.json()) || []) as Product[])
     : [];
 
   return (
@@ -14,26 +41,18 @@ export default async function Products() {
       <section id="products" className="py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-3 md:px-4">
           <div className="text-center mb-12 md:mb-16">
-            <p className="text-primary uppercase tracking-widest text-xs md:text-sm font-semibold mb-2">
-              Products
-            </p>
             <h2 className="text-3xl md:text-5xl font-bold mb-4 text-foreground">
-              BY CATEGORIES
+              {sectionContent.title}
             </h2>
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2">
-              We bring you the finest selection over the years with a huge
-              customer base worldwide. We offer a wide range of products without
-              compromising on quality. We ensure the goodwill and trust of our
-              global clients are highly prioritized.
+              {sectionContent.description}
             </p>
           </div>
 
-          {/* Products Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 mb-12 md:mb-16">
             {products.map((product) => (
               <Link key={product.id} href={`/products/${product.id}`}>
                 <div className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer border border-gray-100 hover:scale-105 overflow-hidden">
-                  {/* Top Half - Product Image */}
                   <div className="h-48 bg-gray-50 flex items-center justify-center p-4">
                     <img
                       src={product.image || "/placeholder.svg"}
@@ -42,7 +61,6 @@ export default async function Products() {
                     />
                   </div>
 
-                  {/* Bottom Half - Product Info */}
                   <div className="p-4 md:p-6">
                     <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-2 line-clamp-2">
                       {product.name}

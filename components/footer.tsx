@@ -78,7 +78,6 @@ export default function Footer() {
                 <h3 className="font-bold text-white text-xs md:text-base">
                   {safeData.websiteName || "Agro TechieMentor"}
                 </h3>
-                <p className="text-xs text-white/60">Premium Ag. Products</p>
               </div>
             </div>
             <p className="text-xs md:text-sm text-white/80 leading-relaxed">
@@ -202,10 +201,6 @@ export default function Footer() {
               rights reserved.
             </p>
             <div className="flex flex-col sm:flex-row gap-2 md:gap-4 lg:gap-6 sm:justify-end">
-              <a href="/sitemap" className="hover:text-white transition">
-                Sitemap
-              </a>
-
               <a href="/privacy-policy" className="hover:text-white transition">
                 Privacy
               </a>

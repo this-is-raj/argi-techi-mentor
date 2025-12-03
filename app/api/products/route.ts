@@ -106,8 +106,8 @@ export async function POST(request: NextRequest) {
       description: formData.get("description"),
       benefits: formData.get("benefits"),
       details: formData.get("details"),
-      metaTitle: formData.get("metaTitle"), // ✅ added
-      metaDescription: formData.get("metaDescription"), // ✅ added
+      metaTitle: formData.get("metaTitle"),
+      metaDescription: formData.get("metaDescription"),
       createdAt: new Date(),
     };
 

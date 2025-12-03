@@ -14,6 +14,7 @@ import {
 import Head from "next/head";
 import Contact from "@/components/contact";
 import { redirect } from "next/navigation";
+import ProductImageGallery from "@/components/product-image-gallery";
 
 export default async function ProductDetailPage({
   params,
@@ -77,44 +78,12 @@ export default async function ProductDetailPage({
         {/* Product Section */}
         <section className="max-w-7xl mx-auto px-4 pb-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-            {/* Image Gallery Section */}
-            <div className="space-y-4">
-              {/* Main Image */}
-              <div className="relative bg-gray-50 rounded-2xl overflow-hidden border border-gray-200">
-                <img
-                  src={product?.image}
-                  alt={product?.name}
-                  className="w-full h-80 md:h-96 object-contain p-4 hover:scale-105 transition-transform duration-300"
-                />
-                {/* Zoom Indicator */}
-                <div className="absolute top-4 right-4 bg-white/80 rounded-full p-2 backdrop-blur-sm">
-                  <ZoomIn className="w-5 h-5 text-gray-700" />
-                </div>
-              </div>
-
-              {/* Gallery Thumbnails */}
-              {product?.gallery && product.gallery.length > 0 && (
-                <div className="px-4">
-                  <h3 className="text-sm font-semibold text-gray-700 mb-3">
-                    More Views
-                  </h3>
-                  <div className="flex gap-3 overflow-x-auto pb-2">
-                    {product.gallery.map((img: string, index: number) => (
-                      <div
-                        key={index}
-                        className="flex-shrink-0 w-20 h-20 border-2 border-gray-200 rounded-lg overflow-hidden hover:border-primary transition-colors cursor-pointer"
-                      >
-                        <img
-                          src={img}
-                          alt={`${product.name} view ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Image Gallery Section - Client Component */}
+            <ProductImageGallery
+              mainImage={product?.image}
+              gallery={product?.gallery || []}
+              productName={product?.name}
+            />
 
             {/* Product Details Section */}
             <div className="space-y-6">
