@@ -34,34 +34,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-
-interface AwardItem {
-  _id: string;
-  title: string;
-  description: string;
-  image: string;
-  category: string;
-  featured: boolean;
-  order: number;
-}
-
-interface Certification {
-  _id: string;
-  name: string;
-  image: string;
-  description?: string;
-  featured: boolean;
-  order: number;
-}
-
-interface Compliance {
-  _id: string;
-  title: string;
-  value: string;
-  description?: string;
-  order: number;
-}
-
+import { AwardItem, Certification, Compliance } from "@/types/award";
 export default function Awards() {
   const [awards, setAwards] = useState<AwardItem[]>([]);
   const [certifications, setCertifications] = useState<Certification[]>([]);
@@ -80,21 +53,18 @@ export default function Awards() {
     type: "award",
   });
 
-  // Editing states
   const [editingAwardId, setEditingAwardId] = useState<string | null>(null);
   const [editingCertId, setEditingCertId] = useState<string | null>(null);
   const [editingComplianceId, setEditingComplianceId] = useState<string | null>(
     null
   );
 
-  // Edit forms data
   const [editAwardData, setEditAwardData] = useState<Partial<AwardItem>>({});
   const [editCertData, setEditCertData] = useState<Partial<Certification>>({});
   const [editComplianceData, setEditComplianceData] = useState<
     Partial<Compliance>
   >({});
 
-  // New item states
   const [showNewAwardForm, setShowNewAwardForm] = useState(false);
   const [showNewCertForm, setShowNewCertForm] = useState(false);
   const [showNewComplianceForm, setShowNewComplianceForm] = useState(false);
@@ -161,7 +131,6 @@ export default function Awards() {
     fetchAwardsData();
   }, [showFeaturedOnly]);
 
-  // Awards CRUD operations
   const handleEditAward = (award: AwardItem) => {
     setEditingAwardId(award._id);
     setEditAwardData({ ...award });
@@ -274,7 +243,6 @@ export default function Awards() {
     }
   };
 
-  // Certifications CRUD operations
   const handleEditCert = (cert: Certification) => {
     setEditingCertId(cert._id);
     setEditCertData({ ...cert });
@@ -353,7 +321,6 @@ export default function Awards() {
     }
   };
 
-  // Compliances CRUD operations
   const handleEditCompliance = (compliance: Compliance) => {
     setEditingComplianceId(compliance._id);
     setEditComplianceData({ ...compliance });

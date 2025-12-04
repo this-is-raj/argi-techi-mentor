@@ -1,12 +1,12 @@
 "use client";
 
 import type React from "react";
-
 import { useState } from "react";
 import { validateAdmin, setAdminSession } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import Image from "next/image";
 
 export default function AdminLogin({
   onLoginSuccess,
@@ -33,16 +33,25 @@ export default function AdminLogin({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md p-8 shadow-lg">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-white flex items-center justify-center p-4">
+      <Card className="w-full max-w-md p-8 shadow-xl border border-green-200 rounded-2xl bg-white/80 backdrop-blur">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-orange-600">Admin Panel</h1>
+          <div className="flex justify-center mb-4">
+            <Image
+              src="/Logo.png"
+              width={70}
+              height={70}
+              alt="Website Logo"
+              className="rounded-full shadow"
+            />
+          </div>
+          <h1 className="text-3xl font-bold text-green-700">Admin Login</h1>
           <p className="text-gray-600 mt-2">Agro TechieMentor</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Email
             </label>
             <Input
@@ -51,12 +60,12 @@ export default function AdminLogin({
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter admin email"
               required
-              className="w-full"
+              className="w-full border-green-300 focus:ring-green-500"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
             </label>
             <Input
@@ -65,7 +74,7 @@ export default function AdminLogin({
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter password"
               required
-              className="w-full"
+              className="w-full border-green-300 focus:ring-green-500"
             />
           </div>
 
@@ -78,7 +87,7 @@ export default function AdminLogin({
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-600 hover:bg-orange-700 text-white py-2"
+            className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg"
           >
             {loading ? "Logging in..." : "Login"}
           </Button>

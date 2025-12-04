@@ -123,16 +123,19 @@ export default function HarvestCalendar() {
                             <img
                               src={product.image}
                               alt={product.name}
-                              className="w-8 h-8 object-contain"
+                              className="w-10 h-10 rounded-full object-cover"
                               onError={(e) => {
-                                (e.target as HTMLImageElement).style.display =
-                                  "none";
-                                const parent = (e.target as HTMLImageElement)
-                                  .parentElement;
+                                const img = e.target as HTMLImageElement;
+                                img.style.display = "none";
+
+                                const parent = img.parentElement;
                                 if (parent) {
-                                  parent.innerHTML = `<span class="text-white text-sm font-bold">${product.name.charAt(
-                                    0
-                                  )}</span>`;
+                                  parent.innerHTML = `
+        <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden">
+          <span class="text-sm font-semibold">
+            ${product.name.charAt(0).toUpperCase()}
+          </span>
+        </div>`;
                                 }
                               }}
                             />

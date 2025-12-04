@@ -34,22 +34,6 @@ export async function GET() {
       ])
       .toArray();
 
-    console.log("DEBUG: Found", enquiries.length, "enquiries");
-
-    enquiries.forEach((enquiry, index) => {
-      console.log(`Enquiry ${index + 1}:`, {
-        enquiryId: enquiry._id,
-        customer: enquiry.name,
-        productCount: enquiry.productDetails?.length || 0,
-        productDetails: enquiry.productDetails?.map((p: any) => ({
-          id: p.id,
-          name: p.name,
-          image: p.image,
-          hasImage: !!p.image,
-        })),
-      });
-    });
-
     const formattedEnquiries = enquiries.map((enquiry) => ({
       _id: enquiry._id.toString(),
       name: enquiry.name || "",
@@ -62,8 +46,6 @@ export async function GET() {
         .map((id: ObjectId) => id?.toString() || "")
         .filter(Boolean),
       productDetails: (enquiry.productDetails || []).map((product: any) => {
-        console.log("Processing product:", product);
-
         return {
           id: product?.id || product?._id?.toString() || "",
           name: product?.name || "Unknown Product",
@@ -106,8 +88,6 @@ export async function POST(request: NextRequest) {
     const { db } = await connectToDatabase();
     const body = await request.json();
 
-    console.log("Received enquiry data:", body);
-
     const { name, email, phone, city, country, enquiry, productIds } = body;
 
     if (!name || !email || !enquiry) {
@@ -149,7 +129,6 @@ export async function POST(request: NextRequest) {
       read: false,
       source: "website",
     };
-    console.log("Inserting enquiry data:", enquiryData);
     const result = await db.collection("enquiries").insertOne(enquiryData);
 
     const createdEnquiry = await db

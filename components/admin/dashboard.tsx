@@ -209,7 +209,7 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 <div>
                   <p className="text-sm font-semibold text-white">Admin User</p>
                   <p className="text-xs text-emerald-200/70">
-                    admin@agritech.com
+                    TechieMentor.co@gmail.com{" "}
                   </p>
                 </div>
               </div>
