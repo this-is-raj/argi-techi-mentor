@@ -248,25 +248,6 @@ export default function QualityPage() {
                   <p className="text-gray-600 text-sm sm:text-base leading-relaxed mb-3 sm:mb-4">
                     {foundation.description}
                   </p>
-
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="flex items-center text-green-600 text-xs sm:text-sm font-medium">
-                      <span>Learn more</span>
-                      <svg
-                        className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2 transform group-hover:translate-x-1 transition-transform"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M14 5l7 7m0 0l-7 7m7-7H3"
-                        />
-                      </svg>
-                    </div>
-                  </div>
                 </div>
               </div>
             ))}
