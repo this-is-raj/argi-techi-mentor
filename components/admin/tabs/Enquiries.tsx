@@ -96,17 +96,10 @@ export default function EnquiriesTab() {
 
       const data = await res.json();
 
-      console.log("DEBUG: Received data:", {
-        count: data.length,
-        firstEnquiry: data[0],
-        firstProductDetails: data[0]?.productDetails,
-      });
-
       const normalizedData = data.map((enquiry: any) => ({
         ...enquiry,
         selectedProducts: enquiry.selectedProducts || [],
         productDetails: (enquiry.productDetails || []).map((product: any) => {
-          console.log("Product data:", product);
           return {
             id: product.id || product._id || "",
             name: product.name || "Unknown Product",
@@ -134,7 +127,6 @@ export default function EnquiriesTab() {
         source: enquiry.source || "website",
       }));
 
-      console.log("Normalized data:", normalizedData);
       setEnquiries(normalizedData);
       setError("");
     } catch (err) {
@@ -150,8 +142,6 @@ export default function EnquiriesTab() {
   };
 
   const openEnquiryDetails = (enquiry: Enquiry) => {
-    console.log("Opening enquiry:", enquiry);
-    console.log("Product details:", enquiry.productDetails);
     setSelectedEnquiry({
       ...enquiry,
       selectedProducts: enquiry.selectedProducts || [],
