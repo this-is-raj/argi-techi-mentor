@@ -1,47 +1,17 @@
 "use client";
-import { useState, useEffect } from "react";
-import { awardService } from "@/service/awards.service";
-import { AwardItem, Certification, Compliance } from "@/types/award";
+
+import { useAwards } from "@/hook/useAwards";
+
 export default function Awards() {
-  const [awards, setAwards] = useState<AwardItem[]>([]);
-  const [certifications, setCertifications] = useState<Certification[]>([]);
-  const [compliances, setCompliances] = useState<Compliance[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchAwardsData();
-  }, []);
-
-  const fetchAwardsData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const data = await awardService.fetchAwardsData();
-
-      const featuredAwards = awardService.getFeaturedAwards(data.awards || []);
-      setAwards(featuredAwards);
-
-      const featuredCerts = awardService.getFeaturedCertifications(
-        data.certifications || []
-      );
-      setCertifications(featuredCerts);
-
-      setCompliances(data.compliances || []);
-    } catch (error) {
-      console.error("Error fetching awards data:", error);
-      setError("Failed to load awards data. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data, loading, error, refetch } = useAwards();
+  const { awards, certifications, compliances } = data;
 
   if (loading) {
     return (
-      <section id="quality" className="py-20 bg-gray-50">
+      <section id="awards" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <div className="animate-pulse space-y-4">
+          <div className="animate-pulse">Loading awards...</div>
+          <div className="animate-pulse space-y-4 mt-6">
             <div className="h-10 bg-gray-200 rounded w-1/3 mx-auto"></div>
             <div className="h-64 bg-gray-200 rounded"></div>
           </div>
@@ -52,12 +22,12 @@ export default function Awards() {
 
   if (error) {
     return (
-      <section id="quality" className="py-20 bg-gray-50">
+      <section id="awards" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <div className="bg-red-50 p-6 rounded-lg">
             <p className="text-red-600">{error}</p>
             <button
-              onClick={fetchAwardsData}
+              onClick={refetch}
               className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
             >
               Retry
@@ -69,42 +39,48 @@ export default function Awards() {
   }
 
   return (
-    <section id="quality" className="py-20 bg-gray-50">
+    <section id="awards" className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-4xl font-bold mb-16 text-center">
-          Awards & Accreditations
-        </h2>
-
+        {/* Awards */}
         {awards.length > 0 && (
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            {awards.map((award) => (
-              <div
-                key={award._id}
-                className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition"
-              >
-                {award.image && (
-                  <img
-                    src={award.image}
-                    alt={award.title}
-                    className="h-20 w-auto mx-auto mb-6 object-contain"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                )}
-                <h3 className="text-2xl font-bold mb-3 text-center">
-                  {award.title}
-                </h3>
-                <p className="text-muted-foreground leading-relaxed text-center">
-                  {award.description}
-                </p>
-              </div>
-            ))}
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Awards & Accreditations
+            </h2>
+            <div className="grid md:grid-cols-2 gap-8">
+              {awards.map((award) => (
+                <div
+                  key={award._id}
+                  className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition"
+                >
+                  {award.image && (
+                    <img
+                      src={award.image}
+                      alt={award.title}
+                      className="h-20 w-auto mx-auto mb-6 object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                  )}
+                  <h3 className="text-2xl font-bold mb-3 text-center">
+                    {award.title}
+                  </h3>
+                  <p className="text-gray-500 text-sm text-center">
+                    {award.description}
+                  </p>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
+        {/* Certifications */}
         {certifications.length > 0 && (
-          <div className="bg-white p-10 rounded-2xl shadow-lg mb-10">
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Certifications
+            </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-6 place-items-center">
               {certifications.map((cert) => (
                 <img
@@ -121,18 +97,12 @@ export default function Awards() {
           </div>
         )}
 
+        {/* Compliances */}
         {compliances.length > 0 && (
-          <div className="bg-white p-8 md:p-14 lg:p-16 rounded-3xl shadow-xl border border-gray-100">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-3">
-                Official Compliance Details
-              </h2>
-              <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
-                Transparent business operations with all required government
-                registrations and compliance certifications.
-              </p>
-            </div>
-
+          <div className="mb-12 text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              Official Compliance Details
+            </h2>
             <div className="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
               {compliances.map((compliance) => (
                 <div
@@ -156,6 +126,7 @@ export default function Awards() {
           </div>
         )}
 
+        {/* Empty State */}
         {awards.length === 0 &&
           certifications.length === 0 &&
           compliances.length === 0 && (
